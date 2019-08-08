@@ -1,1 +1,1 @@
-The ArrayExcelBuilder is free software.
+The VaultSecret is free software.
