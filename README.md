@@ -10,8 +10,8 @@ The extension allows to **LOAD** the Vault secrets from json files and **GET** t
 
 For license information check the [LICENSE](LICENSE.md)-file.
 
-[![Latest Stable Version](https://poser.pugx.org/kebacorp/vaultsecret/v/stable)](https://packagist.org/packages/kebacorp/vaultsecret)
 [![Total Downloads](https://poser.pugx.org/kebacorp/vaultsecret/downloads)](https://packagist.org/packages/kebacorp/vaultsecret)
+[![Latest Stable Version](https://poser.pugx.org/kebacorp/vaultsecret/v/stable)](https://packagist.org/packages/kebacorp/vaultsecret)
 [![License](https://poser.pugx.org/kebacorp/vaultsecret/license)](https://packagist.org/packages/kebacorp/vaultsecret)
 
 
