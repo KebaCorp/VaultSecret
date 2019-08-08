@@ -48,3 +48,15 @@ to the require section of your composer.json.
 
 Usage:
 ------
+
+```php
+<?php
+
+use KebaCorp\VaultSecret\VaultSecret;
+
+// Load secrets from file
+VaultSecret::load('path/secret.json');
+
+// Get the secret by key
+$secret = VaultSecret::getSecret('SECRET_KEY');
+```

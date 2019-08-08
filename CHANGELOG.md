@@ -1,6 +1,12 @@
 Array Excel Builder extension Change Log
 ========================================
 
+1.0.4, August 08, 2019
+------------------------
+
+- Added methods to get secrets.
+
+
 1.0.3, August 08, 2019
 ------------------------
 

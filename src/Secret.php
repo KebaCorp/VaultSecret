@@ -69,15 +69,49 @@ class Secret
     }
 
     /**
+     * Loads json secret file.
+     *
      * @param string $secretFileName
+     * @return bool
      */
     public function load($secretFileName)
     {
         if (file_exists($secretFileName)) {
             $file = file_get_contents($secretFileName);
 
-            $this->_secretDto->secrets = $file;
-            print_r($this->_secretDto);
+            if ($data = json_decode($file, true)) {
+
+                // Sets secrets
+                if (isset($data['data']['data']) && is_array($data['data']['data'])) {
+                    $this->_secretDto->secrets = array_merge($this->_secretDto->secrets, $data['data']['data']);
+                }
+
+                return true;
+            }
         }
+
+        return false;
+    }
+
+    /**
+     * Returns secret by key.
+     *
+     * @param $key
+     * @param string $default
+     * @return string
+     */
+    public function getSecret($key, $default = '')
+    {
+        return isset($this->_secretDto->secrets[$key]) ? $this->_secretDto->secrets[$key] : $default;
+    }
+
+    /**
+     * Returns secret DTO.
+     *
+     * @return SecretDTO
+     */
+    public function getSecretDto()
+    {
+        return $this->_secretDto;
     }
 }
