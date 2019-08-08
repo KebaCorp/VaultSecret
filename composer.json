@@ -21,6 +21,12 @@
     "php": ">=5.3"
   },
   "require-dev": {},
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    }
+  ],
   "autoload": {
     "psr-4": {
       "KebaCorp\\VaultSecret\\": "src",
