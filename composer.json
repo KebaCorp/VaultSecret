@@ -1,5 +1,5 @@
 {
-  "name": "abek/vaultsecret",
+  "name": "kebacorp/vaultsecret",
   "description": "The extension allows to load the Vault secrets from json files and get them",
   "keywords": [
     "vault"
