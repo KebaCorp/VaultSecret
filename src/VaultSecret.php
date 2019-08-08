@@ -18,5 +18,14 @@ namespace KebaCorp\VaultSecret;
  */
 class VaultSecret
 {
-
+    /**
+     * @param string $secretFileName
+     */
+    static public function load($secretFileName)
+    {
+        if (file_exists($secretFileName)) {
+            $file = file_get_contents($secretFileName);
+            print_r($file);
+        }
+    }
 }
