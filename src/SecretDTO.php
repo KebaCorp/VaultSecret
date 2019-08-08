@@ -15,5 +15,10 @@ namespace KebaCorp\VaultSecret;
  */
 class SecretDTO
 {
-    public $secrets;
+    /**
+     * Secrets array.
+     *
+     * @var array
+     */
+    public $secrets = array();
 }

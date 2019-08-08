@@ -19,11 +19,38 @@ namespace KebaCorp\VaultSecret;
 class VaultSecret
 {
     /**
+     * Loads json secret file.
+     *
      * @param string $secretFileName
+     * @return bool
      */
     static public function load($secretFileName)
     {
         $secret = Secret::getInstance();
-        $secret->load($secretFileName);
+        return $secret->load($secretFileName);
+    }
+
+    /**
+     * Returns secret by key.
+     *
+     * @param $key
+     * @param string $default
+     * @return string
+     */
+    static public function getSecret($key, $default = '')
+    {
+        $secret = Secret::getInstance();
+        return $secret->getSecret($key, $default);
+    }
+
+    /**
+     * Returns secret DTO.
+     *
+     * @return SecretDTO
+     */
+    static public function getSecretDto()
+    {
+        $secret = Secret::getInstance();
+        return $secret->getSecretDto();
     }
 }
