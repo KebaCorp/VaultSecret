@@ -1,0 +1,33 @@
+{
+  "name": "abek/vaultsecret",
+  "description": "The extension allows to load the Vault secrets from json files and get them",
+  "keywords": [
+    "vault"
+  ],
+  "homepage": "https://github.com/KebaCorp/ArrayExcelBuilder",
+  "type": "extension",
+  "license": "BSD-3-Clause",
+  "authors": [
+    {
+      "name": "Abek Narynov",
+      "homepage": "https://www.facebook.com/abeknarynov"
+    }
+  ],
+  "support": {
+    "source": "https://github.com/KebaCorp/VaultSecret"
+  },
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=5.3"
+  },
+  "require-dev": {},
+  "autoload": {
+    "psr-4": {
+      "KebaCorp\\VaultSecret\\": "src",
+      "app\\": ""
+    }
+  },
+  "config": {
+    "optimize-autoloader": true
+  }
+}
