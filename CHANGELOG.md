@@ -1,6 +1,12 @@
 Array Excel Builder extension Change Log
 ========================================
 
+1.0.5, August 15, 2019
+----------------------
+
+- feat: Added support for reading KV2.
+
+
 1.0.4, August 08, 2019
 ------------------------
 
