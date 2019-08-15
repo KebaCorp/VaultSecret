@@ -82,8 +82,8 @@ class Secret
             if ($data = json_decode($file, true)) {
 
                 // Sets secrets
-                if (isset($data['data']['data']) && is_array($data['data']['data'])) {
-                    $this->_secretDto->secrets = array_merge($this->_secretDto->secrets, $data['data']['data']);
+                if (isset($data['data']) && is_array($data['data'])) {
+                    $this->_secretDto->secrets = array_merge($this->_secretDto->secrets, $data['data']);
                 }
 
                 return true;
