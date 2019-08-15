@@ -6,12 +6,15 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use KebaCorp\VaultSecret\VaultSecret;
 
+$secretsFilename1 = __DIR__ . '/../secretKV2.json';
+$secretsFilename2 = __DIR__ . '/../secretKV2_2.json';
+
 echo "<pre>";
 
-var_dump(VaultSecret::load(__DIR__ . '/../secret.json'));
+var_dump(VaultSecret::load($secretsFilename1));
 echo "\n";
 
-var_dump(VaultSecret::load(__DIR__ . '/../secret2.json'));
+var_dump(VaultSecret::load($secretsFilename2));
 echo "\n";
 
 var_dump(VaultSecret::getSecretDto());

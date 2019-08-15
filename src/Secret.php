@@ -8,6 +8,9 @@
 
 namespace KebaCorp\VaultSecret;
 
+use KebaCorp\VaultSecret\template\TemplateAbstract;
+use KebaCorp\VaultSecret\template\TemplateCreator;
+
 /**
  * Class Secret.
  *
@@ -17,6 +20,11 @@ namespace KebaCorp\VaultSecret;
  */
 class Secret
 {
+    /**
+     * Default generated template's filename.
+     */
+    const GENERATED_TEMPLATE_FILENAME = 'secretsTemplate.json';
+
     /**
      * @var Secret
      */
@@ -30,14 +38,22 @@ class Secret
     private $_secretDto;
 
     /**
+     * Template.
+     *
+     * @var TemplateAbstract
+     */
+    private $_template;
+
+    /**
      * Gets the instance via lazy initialization (created on first usage).
      *
+     * @param int $templateType
      * @return Secret
      */
-    public static function getInstance()
+    public static function getInstance($templateType = TemplateCreator::TEMPLATE_KV2)
     {
         if (null === static::$instance) {
-            static::$instance = new static();
+            static::$instance = new static($templateType);
         }
 
         return static::$instance;
@@ -48,10 +64,13 @@ class Secret
      *
      * Is not allowed to call from outside to prevent from creating multiple instances,
      * to use the singleton, you have to obtain the instance from Singleton::getInstance() instead.
+     *
+     * @param int $templateType
      */
-    private function __construct()
+    private function __construct($templateType = TemplateCreator::TEMPLATE_KV2)
     {
         $this->_secretDto = new SecretDTO();
+        $this->_template = TemplateCreator::createTemplate($templateType);
     }
 
     /**
@@ -72,22 +91,16 @@ class Secret
      * Loads json secret file.
      *
      * @param string $secretFileName
+     * @param array $options
      * @return bool
      */
-    public function load($secretFileName)
+    public function load($secretFileName, $options = array())
     {
-        if (file_exists($secretFileName)) {
-            $file = file_get_contents($secretFileName);
+        if ($secrets = $this->_template->parseJson($secretFileName)) {
+            $this->_secretDto->secrets = array_merge($this->_secretDto->secrets, $secrets);
 
-            if ($data = json_decode($file, true)) {
-
-                // Sets secrets
-                if (isset($data['data']) && is_array($data['data'])) {
-                    $this->_secretDto->secrets = array_merge($this->_secretDto->secrets, $data['data']);
-                }
-
-                return true;
-            }
+            // Apply passed options
+            $this->_applyOptions($options);
         }
 
         return false;
@@ -113,5 +126,22 @@ class Secret
     public function getSecretDto()
     {
         return $this->_secretDto;
+    }
+
+    /**
+     * Apply passed options.
+     *
+     * @param $options
+     */
+    private function _applyOptions($options)
+    {
+        // Save template
+        $isSaveTemplate = isset($options['saveTemplate']) ? $options['saveTemplate'] : true;
+        if ($isSaveTemplate) {
+            $filename = isset($options['saveTemplateFilename'])
+                ? $options['saveTemplateFilename']
+                : self::GENERATED_TEMPLATE_FILENAME;
+            $this->_template->saveTemplateToFile($filename, $this->getSecretDto());
+        }
     }
 }
