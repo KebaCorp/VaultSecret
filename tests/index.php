@@ -20,7 +20,7 @@ echo "\n";
 var_dump(VaultSecret::getSecretDto());
 echo "\n";
 
-var_dump(VaultSecret::getSecret('MYSQL_DB_USER'));
+var_dump(VaultSecret::getSecret('http://vault:8200/v1/vault', 'MYSQL_DB_USER'));
 echo "\n";
 
 var_dump(VaultSecret::getSecret('MYSQL_DB_USER2', 'Default'));

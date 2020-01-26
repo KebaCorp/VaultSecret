@@ -19,7 +19,9 @@
   "minimum-stability": "stable",
   "require": {
     "php": ">=5.3",
-    "ext-json": "*"
+    "ext-json": "*",
+    "ext-curl": "*",
+    "psr/simple-cache": "*"
   },
   "require-dev": {},
   "repositories": [

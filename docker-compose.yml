@@ -18,3 +18,16 @@ services:
       - ${WEB_PATH}:/var/www/html/
     working_dir: /var/www/html/
     command: composer update --ignore-platform-reqs
+
+  vault:
+    image: vault:latest
+    ports:
+      - ${VAULT_PORT}:8200
+    volumes:
+      - ./docker/vault/config:/vault/config
+      - ./docker/vault/policies:/vault/policies
+      - ./docker/vault/data:/vault/data
+      - ./docker/vault/logs:/vault/logs
+    entrypoint: vault server -config=/vault/config/vault-config.json
+    cap_add:
+      - IPC_LOCK

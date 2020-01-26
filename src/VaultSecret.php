@@ -22,13 +22,13 @@ class VaultSecret
      * Loads json secret file.
      *
      * @param string $secretFileName
-     * @param array $options
+     * @param VaultSecretParams|null $vaultSecretParams
      * @return bool
      */
-    static public function load($secretFileName, $options = array())
+    static public function load($secretFileName, VaultSecretParams $vaultSecretParams = null)
     {
         $secret = Secret::getInstance();
-        return $secret->load($secretFileName, $options);
+        return $secret->load($secretFileName, $vaultSecretParams);
     }
 
     /**

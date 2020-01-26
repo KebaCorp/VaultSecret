@@ -8,8 +8,11 @@
 
 namespace KebaCorp\VaultSecret;
 
+use Exception;
 use KebaCorp\VaultSecret\template\TemplateAbstract;
 use KebaCorp\VaultSecret\template\TemplateCreator;
+use Psr\SimpleCache\InvalidArgumentException;
+use SecretCache;
 
 /**
  * Class Secret.
@@ -21,11 +24,8 @@ use KebaCorp\VaultSecret\template\TemplateCreator;
 class Secret
 {
     /**
-     * Default generated template's filename.
-     */
-    const GENERATED_TEMPLATE_FILENAME = 'secretsTemplate.json';
-
-    /**
+     * Secret instance.
+     *
      * @var Secret
      */
     private static $instance;
@@ -43,6 +43,13 @@ class Secret
      * @var TemplateAbstract
      */
     private $_template;
+
+    /**
+     * Vault secret params.
+     *
+     * @var VaultSecretParams
+     */
+    private $_vaultSecretParams;
 
     /**
      * Gets the instance via lazy initialization (created on first usage).
@@ -71,6 +78,7 @@ class Secret
     {
         $this->_secretDto = new SecretDTO();
         $this->_template = TemplateCreator::createTemplate($templateType);
+        $this->_vaultSecretParams = new VaultSecretParams();
     }
 
     /**
@@ -91,31 +99,57 @@ class Secret
      * Loads json secret file.
      *
      * @param string $secretFileName
-     * @param array $options
+     * @param VaultSecretParams|null $vaultSecretParams
      * @return bool
      */
-    public function load($secretFileName, $options = array())
+    public function load($secretFileName, VaultSecretParams $vaultSecretParams = null)
     {
+        // Set vault secret params
+        if ($vaultSecretParams instanceof VaultSecretParams) {
+            $this->_vaultSecretParams = $vaultSecretParams;
+        }
+
+        // Apply vault secret params
+        $this->_applyOptions();
+
         if ($secrets = $this->_template->parseJson($secretFileName)) {
             $this->_secretDto->secrets = array_merge($this->_secretDto->secrets, $secrets);
 
-            // Apply passed options
-            $this->_applyOptions($options);
+            return true;
         }
 
         return false;
     }
 
+//    /**
+//     * Returns secret by key.
+//     *
+//     * @param $key
+//     * @param string $default
+//     * @return string
+//     */
+//    public function getSecret($key, $default = '')
+//    {
+//        return isset($this->_secretDto->secrets[$key]) ? $this->_secretDto->secrets[$key] : $default;
+//    }
+
     /**
      * Returns secret by key.
      *
-     * @param $key
-     * @param string $default
+     * @param string $url
+     * @param string $key
+     * @param int $type
      * @return string
      */
-    public function getSecret($key, $default = '')
+    public function getSecret($url, $key, $type = TemplateCreator::TEMPLATE_KV2)
     {
-        return isset($this->_secretDto->secrets[$key]) ? $this->_secretDto->secrets[$key] : $default;
+        $cache = SecretCache::getInstance();
+
+        try {
+            return $cache->get($url);
+        } catch (InvalidArgumentException $e) {
+            return null;
+        }
     }
 
     /**
@@ -129,19 +163,47 @@ class Secret
     }
 
     /**
-     * Apply passed options.
-     *
-     * @param $options
+     * Apply vault secret params.
      */
-    private function _applyOptions($options)
+    private function _applyOptions()
     {
         // Save template
-        $isSaveTemplate = isset($options['saveTemplate']) ? $options['saveTemplate'] : true;
-        if ($isSaveTemplate) {
-            $filename = isset($options['saveTemplateFilename'])
-                ? $options['saveTemplateFilename']
-                : self::GENERATED_TEMPLATE_FILENAME;
-            $this->_template->saveTemplateToFile($filename, $this->getSecretDto());
+        if ($this->_vaultSecretParams->isIsSaveTemplate()) {
+            $this->_template->saveTemplateToFile(
+                $this->_vaultSecretParams->getSaveTemplateFilename(),
+                $this->getSecretDto()
+            );
         }
+    }
+
+    /**
+     * Connect to Vault service and get secrets by url.
+     *
+     * @param $url
+     * @param $token
+     * @return bool|string
+     * @throws Exception
+     */
+    private function _connectAndGet($url, $token)
+    {
+        $ch = curl_init($url);
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "X-Vault-Token: {$token}",
+            'X-Vault-Namespace: ns1/ns2/',
+            'Content-Type: application/json',
+        ]);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $result = curl_exec($ch);
+
+        if (curl_error($ch) || $result === false) {
+            throw new Exception($ch);
+        }
+
+        curl_close($ch);
+
+        return $result;
     }
 }
