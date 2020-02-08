@@ -8,7 +8,6 @@
 
 namespace KebaCorp\VaultSecret\template\templates;
 
-use KebaCorp\VaultSecret\SecretDTO;
 use KebaCorp\VaultSecret\template\TemplateAbstract;
 
 /**
@@ -19,42 +18,18 @@ use KebaCorp\VaultSecret\template\TemplateAbstract;
 class KV2 extends TemplateAbstract
 {
     /**
-     * Parse and return secret array data.
+     * Return secret by key from data.
      *
-     * @param string $secretFileName
-     * @return array
+     * @param string $key
+     * @param array $data
+     * @return mixed|null
      */
-    public function parseJson($secretFileName)
+    public function getSecret($key, $data)
     {
-        if (file_exists($secretFileName)) {
-            $file = file_get_contents($secretFileName);
-            if ($data = json_decode($file, true)) {
-
-                // Sets secrets
-                if (isset($data['data']) && is_array($data['data'])) {
-                    return $data['data'];
-                }
-            }
+        if (isset($data['data']['data'][$key])) {
+            return $data['data']['data'][$key];
         }
 
-        return array();
-    }
-
-    /**
-     * Returns json template string.
-     *
-     * @param SecretDTO $secretDto
-     * @return string
-     */
-    public function generateJsonTemplate(SecretDTO $secretDto)
-    {
-        $data = array();
-
-        $secrets = $secretDto->secrets;
-        foreach ($secrets as $key => $secret) {
-            $data[$key] = '';
-        }
-
-        return json_encode(array('data' => $data), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        return null;
     }
 }

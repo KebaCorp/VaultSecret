@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by Abek Narynov.
- * Date: 2019-08-08
+ * Date: 2020-02-08
  * @link https://github.com/KebaCorp
  * @copyright Copyright (c) 2018 KebaCorp
  */
@@ -9,16 +9,14 @@
 namespace KebaCorp\VaultSecret;
 
 /**
- * Class SecretDTO.
+ * Class SecretConstants.
  *
  * @package KebaCorp\VaultSecret
  */
-class SecretDTO
+class SecretConstants
 {
     /**
-     * Secrets array.
-     *
-     * @var array
+     * InvalidArgumentException error message.
      */
-    public $secrets = array();
+    const INVALID_ARGUMENT_EXCEPTION_MESSAGE = 'The secret key must be a string';
 }

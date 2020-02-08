@@ -8,8 +8,6 @@
 
 namespace KebaCorp\VaultSecret\template;
 
-use KebaCorp\VaultSecret\SecretDTO;
-
 /**
  * Class TemplateAbstract.
  *
@@ -18,30 +16,11 @@ use KebaCorp\VaultSecret\SecretDTO;
 abstract class TemplateAbstract
 {
     /**
-     * Parse and return secret array data.
+     * Return secret by key from data.
      *
-     * @param string $secretFileName
-     * @return array
+     * @param string $key
+     * @param array $data
+     * @return mixed|null
      */
-    abstract public function parseJson($secretFileName);
-
-    /**
-     * Returns json template string.
-     *
-     * @param SecretDTO $secretDto
-     * @return string
-     */
-    abstract public function generateJsonTemplate(SecretDTO $secretDto);
-
-    /**
-     * Save template to file.
-     *
-     * @param $filename
-     * @param SecretDTO $secretDto
-     * @return bool
-     */
-    public function saveTemplateToFile($filename, SecretDTO $secretDto)
-    {
-        return !!file_put_contents($filename, $this->generateJsonTemplate($secretDto));
-    }
+    abstract public function getSecret($key, $data);
 }

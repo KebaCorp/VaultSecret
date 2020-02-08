@@ -29,5 +29,7 @@ services:
       - ./docker/vault/data:/vault/data
       - ./docker/vault/logs:/vault/logs
     entrypoint: vault server -config=/vault/config/vault-config.json
+    environment:
+      - VAULT_ADDR=http://localhost:8200
     cap_add:
       - IPC_LOCK

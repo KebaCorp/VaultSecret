@@ -8,6 +8,9 @@
 
 namespace KebaCorp\VaultSecret;
 
+use Exception;
+use KebaCorp\VaultSecret\template\TemplateCreator;
+
 /**
  * Class VaultSecret.
  *
@@ -19,39 +22,74 @@ namespace KebaCorp\VaultSecret;
 class VaultSecret
 {
     /**
-     * Loads json secret file.
+     * Set VaultSecret params object.
      *
-     * @param string $secretFileName
-     * @param VaultSecretParams|null $vaultSecretParams
-     * @return bool
+     * @param VaultSecretParams $vaultSecretParams
      */
-    static public function load($secretFileName, VaultSecretParams $vaultSecretParams = null)
+    static public function setParams(VaultSecretParams $vaultSecretParams)
     {
         $secret = Secret::getInstance();
-        return $secret->load($secretFileName, $vaultSecretParams);
+
+        $secret->setVaultSecretParams($vaultSecretParams);
     }
 
     /**
-     * Returns secret by key.
+     * Returns secret by key from Vault server.
      *
-     * @param $key
-     * @param string $default
-     * @return string
+     * @param string $key
+     * Secret key.
+     *
+     * @param string|null $url
+     * Default Vault url to secrets.
+     * If the url is null, then the url will be taken from the VaultSecretParams.
+     *
+     * @param mixed|null $default
+     * Returns the default value if the secret was not found.
+     *
+     * @param int $type
+     * Vault data parser template type.
+     *
+     * @return mixed|null
+     * Returns null if no secrets were found.
+     *
+     * @throws Exception
      */
-    static public function getSecret($key, $default = '')
+    static public function getSecret($key, $url = null, $default = null, $type = TemplateCreator::TEMPLATE_KV2)
     {
         $secret = Secret::getInstance();
-        return $secret->getSecret($key, $default);
+
+        return $secret->getSecret($key, $url, $default, $type);
     }
 
     /**
-     * Returns secret DTO.
+     * Returns secret by key from json file.
      *
-     * @return SecretDTO
+     * @param string $key
+     * Secret key.
+     *
+     * @param string|null $file
+     * Default path to json file with Vault secrets.
+     * If the filename is null, then the filename will be taken from the VaultSecretParams.
+     *
+     * @param mixed|null $default
+     * Returns the default value if the secret was not found.
+     *
+     * @param int $type
+     * Vault data parser template type.
+     *
+     * @return mixed|null
+     * Returns null if no secrets were found.
+     *
+     * @throws Exception
      */
-    static public function getSecretDto()
-    {
+    static public function getSecretFromJsonFile(
+        $key,
+        $file = null,
+        $default = null,
+        $type = TemplateCreator::TEMPLATE_KV2
+    ) {
         $secret = Secret::getInstance();
-        return $secret->getSecretDto();
+
+        return $secret->getSecretFromJsonFile($key, $file, $default, $type);
     }
 }

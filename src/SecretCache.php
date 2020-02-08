@@ -1,9 +1,20 @@
 <?php
+/**
+ * Created by Abek Narynov.
+ * Date: 2019-08-08
+ * @link https://github.com/KebaCorp
+ * @copyright Copyright (c) 2018 KebaCorp
+ */
 
+namespace KebaCorp\VaultSecret;
+
+use InvalidArgumentException;
 use Psr\SimpleCache\CacheInterface;
 
 /**
  * Class SecretCache.
+ *
+ * @package KebaCorp\VaultSecret
  */
 class SecretCache implements CacheInterface
 {
@@ -19,7 +30,7 @@ class SecretCache implements CacheInterface
      *
      * @var array
      */
-    private $_cache = [];
+    private $_cache = array();
 
     /**
      * Gets the instance via lazy initialization (created on first usage).
@@ -46,6 +57,20 @@ class SecretCache implements CacheInterface
     }
 
     /**
+     * Prevent the instance from being cloned (which would create a second instance of it).
+     */
+    private function __clone()
+    {
+    }
+
+    /**
+     * Prevent from being unserialized (which would create a second instance of it).
+     */
+    private function __wakeup()
+    {
+    }
+
+    /**
      * Fetches a value from the cache.
      *
      * @param string $key The unique key of this item in the cache.
@@ -53,11 +78,14 @@ class SecretCache implements CacheInterface
      *
      * @return mixed The value of the item from the cache, or $default in case of cache miss.
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     *   MUST be thrown if the $key string is not a legal value.
+     * @throws InvalidArgumentException
      */
     public function get($key, $default = null)
     {
+        if (!is_string($key)) {
+            throw new InvalidArgumentException(SecretConstants::INVALID_ARGUMENT_EXCEPTION_MESSAGE);
+        }
+
         return $this->_cache[$key];
     }
 
@@ -72,11 +100,14 @@ class SecretCache implements CacheInterface
      *
      * @return bool True on success and false on failure.
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     *   MUST be thrown if the $key string is not a legal value.
+     * @throws InvalidArgumentException
      */
     public function set($key, $value, $ttl = null)
     {
+        if (!is_string($key)) {
+            throw new InvalidArgumentException(SecretConstants::INVALID_ARGUMENT_EXCEPTION_MESSAGE);
+        }
+
         $this->_cache[$key] = $value;
 
         return true;
@@ -89,11 +120,14 @@ class SecretCache implements CacheInterface
      *
      * @return bool True if the item was successfully removed. False if there was an error.
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     *   MUST be thrown if the $key string is not a legal value.
+     * @throws InvalidArgumentException
      */
     public function delete($key)
     {
+        if (!is_string($key)) {
+            throw new InvalidArgumentException(SecretConstants::INVALID_ARGUMENT_EXCEPTION_MESSAGE);
+        }
+
         if ($this->has($key)) {
             unset($this->_cache[$key]);
             return true;
@@ -110,7 +144,7 @@ class SecretCache implements CacheInterface
     public function clear()
     {
         if (!empty($this->_cache)) {
-            $this->_cache = [];
+            $this->_cache = array();
             return true;
         }
 
@@ -125,13 +159,11 @@ class SecretCache implements CacheInterface
      *
      * @return iterable A list of key => value pairs. Cache keys that do not exist or are stale will have $default as value.
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     *   MUST be thrown if $keys is neither an array nor a Traversable,
-     *   or if any of the $keys are not a legal value.
+     * @throws InvalidArgumentException
      */
     public function getMultiple($keys, $default = null)
     {
-        $result = [];
+        $result = array();
 
         foreach ($keys as $key) {
             if ($this->has($key)) {
@@ -152,13 +184,16 @@ class SecretCache implements CacheInterface
      *
      * @return bool True on success and false on failure.
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     *   MUST be thrown if $values is neither an array nor a Traversable,
-     *   or if any of the $values are not a legal value.
+     * @throws InvalidArgumentException
      */
     public function setMultiple($values, $ttl = null)
     {
         foreach ($values as $key => $value) {
+
+            if (!is_string($key)) {
+                throw new InvalidArgumentException(SecretConstants::INVALID_ARGUMENT_EXCEPTION_MESSAGE);
+            }
+
             $this->_cache[$key] = $value;
         }
 
@@ -172,13 +207,16 @@ class SecretCache implements CacheInterface
      *
      * @return bool True if the items were successfully removed. False if there was an error.
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     *   MUST be thrown if $keys is neither an array nor a Traversable,
-     *   or if any of the $keys are not a legal value.
+     * @throws InvalidArgumentException
      */
     public function deleteMultiple($keys)
     {
         foreach ($keys as $key) {
+
+            if (!is_string($key)) {
+                throw new InvalidArgumentException(SecretConstants::INVALID_ARGUMENT_EXCEPTION_MESSAGE);
+            }
+
             unset($this->_cache[$key]);
         }
 
@@ -197,11 +235,24 @@ class SecretCache implements CacheInterface
      *
      * @return bool
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     *   MUST be thrown if the $key string is not a legal value.
+     * @throws InvalidArgumentException
      */
     public function has($key)
     {
+        if (!is_string($key)) {
+            throw new InvalidArgumentException(SecretConstants::INVALID_ARGUMENT_EXCEPTION_MESSAGE);
+        }
+
         return isset($this->_cache[$key]);
+    }
+
+    /**
+     * Returns all cache data.
+     *
+     * @return array
+     */
+    public function getAllData()
+    {
+        return $this->_cache;
     }
 }
