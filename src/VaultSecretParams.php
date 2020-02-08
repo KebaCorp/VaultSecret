@@ -28,6 +28,7 @@ class VaultSecretParams
 
     /**
      * Secrets cache.
+     * SecretHybridCache is used by default.
      *
      * @var CacheInterface
      * @since 2.0.0
@@ -65,7 +66,8 @@ class VaultSecretParams
      */
     public function __construct()
     {
-        $this->_cache = SecretCache::getInstance();
+        // Set SecretHybridCache as default cache
+        $this->_cache = SecretHybridCache::getInstance();
     }
 
     /**

@@ -181,11 +181,16 @@ VaultSecret::setParams($vaultSecretParams);
 
 **Set your own cache object:**
 
+*SecretHybridCache is used by default.*
 ```php
 <?php
 
+use KebaCorp\VaultSecret\SecretMemoryCache;
 use KebaCorp\VaultSecret\VaultSecret;
 use KebaCorp\VaultSecret\VaultSecretParams;
+
+// Use your cache object here
+$myCacheObject = SecretMemoryCache::getInstance();
 
 $vaultSecretParams = new VaultSecretParams();
 $vaultSecretParams->setCache($myCacheObject);

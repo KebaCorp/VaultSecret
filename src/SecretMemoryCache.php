@@ -12,17 +12,22 @@ use InvalidArgumentException;
 use Psr\SimpleCache\CacheInterface;
 
 /**
- * Class SecretCache.
+ * Class SecretMemoryCache.
+ * A singleton that keeps secrets in RAM.
+ *
+ * ATTENTION:
+ * Data is stored in the cache only during the client’s connection to the server.
+ * After it requires to load the data again.
  *
  * @package KebaCorp\VaultSecret
  * @since 2.0.0
  */
-class SecretCache implements CacheInterface
+class SecretMemoryCache implements CacheInterface
 {
     /**
      * Secret cache instance.
      *
-     * @var SecretCache
+     * @var SecretMemoryCache
      * @since 2.0.0
      */
     private static $instance;
@@ -38,7 +43,7 @@ class SecretCache implements CacheInterface
     /**
      * Gets the instance via lazy initialization (created on first usage).
      *
-     * @return SecretCache
+     * @return SecretMemoryCache
      * @since 2.0.0
      */
     public static function getInstance()
@@ -51,7 +56,7 @@ class SecretCache implements CacheInterface
     }
 
     /**
-     * SecretCache constructor.
+     * SecretMemoryCache constructor.
      *
      * Is not allowed to call from outside to prevent from creating multiple instances,
      * to use the singleton, you have to obtain the instance from Singleton::getInstance() instead.
@@ -146,6 +151,7 @@ class SecretCache implements CacheInterface
 
         if ($this->has($key)) {
             unset($this->_cache[$key]);
+
             return true;
         }
 
@@ -162,6 +168,7 @@ class SecretCache implements CacheInterface
     {
         if (!empty($this->_cache)) {
             $this->_cache = array();
+
             return true;
         }
 
