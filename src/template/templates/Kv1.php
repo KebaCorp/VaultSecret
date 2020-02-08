@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by Abek Narynov.
- * Date: 2019-08-15
+ * Date: 2020-02-08
  * @link https://github.com/KebaCorp
  * @copyright Copyright (c) 2018 KebaCorp
  */
@@ -11,11 +11,11 @@ namespace KebaCorp\VaultSecret\template\templates;
 use KebaCorp\VaultSecret\template\TemplateAbstract;
 
 /**
- * Class KV2.
+ * Class Kv1.
  *
  * @package KebaCorp\VaultSecret\template\templates
  */
-class KV2 extends TemplateAbstract
+class Kv1 extends TemplateAbstract
 {
     /**
      * Return secret by key from data.
@@ -26,8 +26,8 @@ class KV2 extends TemplateAbstract
      */
     public function getSecret($key, $data)
     {
-        if (isset($data['data']['data'][$key])) {
-            return $data['data']['data'][$key];
+        if (isset($data['data'][$key])) {
+            return $data['data'][$key];
         }
 
         return null;

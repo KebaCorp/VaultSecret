@@ -116,6 +116,7 @@ class Secret
      */
     public function getSecret($key, $url = null, $default = null, $type = TemplateCreator::TEMPLATE_KV2)
     {
+        $secret = null;
         $cache = SecretCache::getInstance();
         $template = TemplateCreator::createTemplate($type);
 
@@ -125,7 +126,7 @@ class Secret
         }
 
         if ($cache->has($url)) {
-            return $template->getSecret($key, $cache->get($url));
+            $secret = $template->getSecret($key, $cache->get($url));
         } else {
             $data = $this->_connectAndGetData($url);
             if ($cache->set($url, $data)) {
@@ -133,14 +134,14 @@ class Secret
                 // Generate and save template json to files
                 $this->_saveTemplate($cache);
 
-                return $template->getSecret($key, $data);
+                $secret = $template->getSecret($key, $data);
             }
         }
 
         // Generate and save template json to files
         $this->_saveTemplate($cache);
 
-        return $default;
+        return $secret === null ? $default : $secret;
     }
 
     /**
@@ -166,6 +167,7 @@ class Secret
      */
     public function getSecretFromJsonFile($key, $file = null, $default = null, $type = TemplateCreator::TEMPLATE_KV2)
     {
+        $secret = null;
         $cache = SecretCache::getInstance();
         $template = TemplateCreator::createTemplate($type);
 
@@ -175,7 +177,7 @@ class Secret
         }
 
         if ($cache->has($file)) {
-            return $template->getSecret($key, $cache->get($file));
+            $secret = $template->getSecret($key, $cache->get($file));
         } else {
             if (file_exists($file)) {
                 $file = file_get_contents($file);
@@ -185,13 +187,13 @@ class Secret
                         // Generate and save template json to files
                         $this->_saveTemplate($cache);
 
-                        return $template->getSecret($key, $data);
+                        $secret = $template->getSecret($key, $data);
                     }
                 }
             }
         }
 
-        return $default;
+        return $secret === null ? $default : $secret;
     }
 
     /**
