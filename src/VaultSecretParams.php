@@ -92,7 +92,7 @@ class VaultSecretParams
     }
 
     /**
-     * Get path to json file with Vault secrets.
+     * Get default path to json file with Vault secrets.
      *
      * @return string
      * @since 2.0.0
@@ -103,7 +103,7 @@ class VaultSecretParams
     }
 
     /**
-     * Set path to json file with Vault secrets.
+     * Set default path to json file with Vault secrets.
      *
      * @param string $file
      * @since 2.0.0

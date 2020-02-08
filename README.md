@@ -6,7 +6,7 @@
     <br>
 </p>
 
-The extension allows to **LOAD** the Vault secrets from json files and **GET** them.
+The extension allows to **LOAD** the Vault secrets from Vault server or from json files and **GET** them.
 
 For license information check the [LICENSE](LICENSE.md)-file.
 
@@ -46,17 +46,149 @@ to the require section of your composer.json.
 
 
 
-Usage:
-------
+Usage
+-----
+
+
+**Get secret from json file:**
 
 ```php
 <?php
 
 use KebaCorp\VaultSecret\VaultSecret;
 
-// Load secrets from file
-VaultSecret::load('path/secret.json');
+// Get secret from json file
+VaultSecret::getSecretFromJsonFile('SECRET_KEY', 'path/secret.json');
+```
 
-// Get the secret by key
-$secret = VaultSecret::getSecret('SECRET_KEY');
+
+**Get secret from Vault server by KV2:**
+
+```php
+<?php
+
+use KebaCorp\VaultSecret\VaultSecret;
+use KebaCorp\VaultSecret\VaultSecretParams;
+
+// Set params
+$vaultSecretParams = new VaultSecretParams();
+$vaultSecretParams->setToken('vaultToken');
+VaultSecret::setParams($vaultSecretParams);
+
+// Get secret from Vault server
+VaultSecret::getSecret('SECRET_KEY', 'http://localhost:8200/v1/kv2/data/secretName');
+```
+
+
+**Get secret from Vault server by KV1:**
+
+```php
+<?php
+
+use KebaCorp\VaultSecret\template\TemplateCreator;
+use KebaCorp\VaultSecret\VaultSecret;
+use KebaCorp\VaultSecret\VaultSecretParams;
+
+// Set params
+$vaultSecretParams = new VaultSecretParams();
+$vaultSecretParams->setToken('vaultToken');
+VaultSecret::setParams($vaultSecretParams);
+
+// Get secret from Vault server
+VaultSecret::getSecret(
+    'SECRET_KEY',
+    'http://localhost:8200/v1/kv2/data/secretName',
+    null,
+    TemplateCreator::TEMPLATE_KV1
+);
+```
+
+
+
+Params
+------
+
+
+**Set Vault token:**
+
+```php
+<?php
+
+use KebaCorp\VaultSecret\VaultSecret;
+use KebaCorp\VaultSecret\VaultSecretParams;
+
+$vaultSecretParams = new VaultSecretParams();
+$vaultSecretParams->setToken('vaultToken');
+VaultSecret::setParams($vaultSecretParams);
+```
+
+
+**Enable Vault secrets template json file creation:**
+
+```php
+<?php
+
+use KebaCorp\VaultSecret\VaultSecret;
+use KebaCorp\VaultSecret\VaultSecretParams;
+
+$vaultSecretParams = new VaultSecretParams();
+$vaultSecretParams->setIsSaveTemplate(true); // Not necessary
+$vaultSecretParams->setSaveTemplateFilename(__DIR__ . '/jsonTemplates/template'); // Not necessary
+VaultSecret::setParams($vaultSecretParams);
+```
+
+
+**Disable Vault secrets template json file creation:**
+
+```php
+<?php
+
+use KebaCorp\VaultSecret\VaultSecret;
+use KebaCorp\VaultSecret\VaultSecretParams;
+
+$vaultSecretParams = new VaultSecretParams();
+$vaultSecretParams->setIsSaveTemplate(false);
+VaultSecret::setParams($vaultSecretParams);
+```
+
+
+**Set default Vault url to secrets:**
+
+```php
+<?php
+
+use KebaCorp\VaultSecret\VaultSecret;
+use KebaCorp\VaultSecret\VaultSecretParams;
+
+$vaultSecretParams = new VaultSecretParams();
+$vaultSecretParams->setUrl('http://localhost:8200/v1/kv2/data/secretName');
+VaultSecret::setParams($vaultSecretParams);
+```
+
+
+**Set default path to json file with Vault secrets:**
+
+```php
+<?php
+
+use KebaCorp\VaultSecret\VaultSecret;
+use KebaCorp\VaultSecret\VaultSecretParams;
+
+$vaultSecretParams = new VaultSecretParams();
+$vaultSecretParams->setFile('path/secret.json');
+VaultSecret::setParams($vaultSecretParams);
+```
+
+
+**Set your own cache object:**
+
+```php
+<?php
+
+use KebaCorp\VaultSecret\VaultSecret;
+use KebaCorp\VaultSecret\VaultSecretParams;
+
+$vaultSecretParams = new VaultSecretParams();
+$vaultSecretParams->setCache($myCache);
+VaultSecret::setParams($vaultSecretParams);
 ```
