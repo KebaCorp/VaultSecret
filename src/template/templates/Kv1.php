@@ -14,6 +14,7 @@ use KebaCorp\VaultSecret\template\TemplateAbstract;
  * Class Kv1.
  *
  * @package KebaCorp\VaultSecret\template\templates
+ * @since 2.0.0
  */
 class Kv1 extends TemplateAbstract
 {
@@ -23,6 +24,7 @@ class Kv1 extends TemplateAbstract
      * @param string $key
      * @param array $data
      * @return mixed|null
+     * @since 2.0.0
      */
     public function getSecret($key, $data)
     {

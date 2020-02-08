@@ -17,6 +17,7 @@ use KebaCorp\VaultSecret\template\TemplateCreator;
  * Singleton to load secret files.
  *
  * @package KebaCorp\VaultSecret
+ * @since 1.0.3
  */
 class Secret
 {
@@ -24,6 +25,7 @@ class Secret
      * Secret instance.
      *
      * @var Secret
+     * @since 1.0.3
      */
     private static $instance;
 
@@ -31,6 +33,7 @@ class Secret
      * Vault secret params.
      *
      * @var VaultSecretParams
+     * @since 2.0.0
      */
     private $_vaultSecretParams;
 
@@ -38,6 +41,7 @@ class Secret
      * Gets the instance via lazy initialization (created on first usage).
      *
      * @return Secret
+     * @since 1.0.3
      */
     public static function getInstance()
     {
@@ -53,6 +57,8 @@ class Secret
      *
      * Is not allowed to call from outside to prevent from creating multiple instances,
      * to use the singleton, you have to obtain the instance from Singleton::getInstance() instead.
+     *
+     * @since 1.0.3
      */
     private function __construct()
     {
@@ -61,6 +67,8 @@ class Secret
 
     /**
      * Prevent the instance from being cloned (which would create a second instance of it).
+     *
+     * @since 1.0.3
      */
     private function __clone()
     {
@@ -68,6 +76,8 @@ class Secret
 
     /**
      * Prevent from being unserialized (which would create a second instance of it).
+     *
+     * @since 1.0.3
      */
     private function __wakeup()
     {
@@ -77,6 +87,7 @@ class Secret
      * Get VaultSecret params object.
      *
      * @return VaultSecretParams
+     * @since 2.0.0
      */
     public function getVaultSecretParams()
     {
@@ -87,6 +98,7 @@ class Secret
      * Set VaultSecret params object.
      *
      * @param VaultSecretParams $vaultSecretParams
+     * @since 2.0.0
      */
     public function setVaultSecretParams($vaultSecretParams)
     {
@@ -113,6 +125,8 @@ class Secret
      * Returns null if no secrets were found.
      *
      * @throws Exception
+     *
+     * @since 1.0.4
      */
     public function getSecret($key, $url = null, $default = null, $type = TemplateCreator::TEMPLATE_KV2)
     {
@@ -164,6 +178,8 @@ class Secret
      * Returns null if no secrets were found.
      *
      * @throws Exception
+     *
+     * @since 2.0.0
      */
     public function getSecretFromJsonFile($key, $file = null, $default = null, $type = TemplateCreator::TEMPLATE_KV2)
     {
@@ -201,6 +217,7 @@ class Secret
      *
      * @param SecretCache $cache
      * @return int Number of saved files
+     * @since 2.0.0
      */
     private function _saveTemplate($cache)
     {
@@ -210,7 +227,7 @@ class Secret
             foreach ($cache->getAllData() as $key => $datum) {
                 $fileCount += !!file_put_contents(
                     $this->_vaultSecretParams->getSaveTemplateFilename() . '_' . ($fileCount + 1) . '.json',
-                    json_encode($datum, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
+                    json_encode($datum, JSON_UNESCAPED_UNICODE | 128)
                 );
             }
         }
@@ -224,15 +241,16 @@ class Secret
      * @param string $url
      * @return array
      * @throws Exception
+     * @since 2.0.0
      */
     private function _connectAndGetData($url)
     {
         $ch = curl_init($url);
 
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
             "Authorization: Bearer {$this->_vaultSecretParams->getToken()}",
             'Content-Type: application/json',
-        ]);
+        ));
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 

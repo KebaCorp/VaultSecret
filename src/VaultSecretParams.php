@@ -8,6 +8,7 @@ use Psr\SimpleCache\CacheInterface;
  * Class VaultSecretParams.
  *
  * @package KebaCorp\VaultSecret
+ * @since 2.0.0
  */
 class VaultSecretParams
 {
@@ -15,6 +16,7 @@ class VaultSecretParams
      * Default Vault url to secrets.
      *
      * @var string
+     * @since 2.0.0
      */
     private $_url;
 
@@ -22,6 +24,7 @@ class VaultSecretParams
      * Default path to json file with Vault secrets.
      *
      * @var string
+     * @since 2.0.0
      */
     private $_file;
 
@@ -29,6 +32,7 @@ class VaultSecretParams
      * Secrets cache.
      *
      * @var CacheInterface
+     * @since 2.0.0
      */
     private $_cache;
 
@@ -36,6 +40,7 @@ class VaultSecretParams
      * Vault token.
      *
      * @var string
+     * @since 2.0.0
      */
     private $_token;
 
@@ -43,6 +48,7 @@ class VaultSecretParams
      * Is save template to file.
      *
      * @var bool
+     * @since 2.0.0
      */
     private $_isSaveTemplate = true;
 
@@ -50,11 +56,13 @@ class VaultSecretParams
      * Save template's filename.
      *
      * @var string
+     * @since 2.0.0
      */
     private $_saveTemplateFilename = 'secretsTemplate.json';
 
     /**
      * VaultSecretParams constructor.
+     * @since 2.0.0
      */
     public function __construct()
     {
@@ -65,6 +73,7 @@ class VaultSecretParams
      * Get default Vault url to secrets.
      *
      * @return string
+     * @since 2.0.0
      */
     public function getUrl()
     {
@@ -75,6 +84,7 @@ class VaultSecretParams
      * Set default Vault url to secrets.
      *
      * @param string $url
+     * @since 2.0.0
      */
     public function setUrl($url)
     {
@@ -85,6 +95,7 @@ class VaultSecretParams
      * Get path to json file with Vault secrets.
      *
      * @return string
+     * @since 2.0.0
      */
     public function getFile()
     {
@@ -95,6 +106,7 @@ class VaultSecretParams
      * Set path to json file with Vault secrets.
      *
      * @param string $file
+     * @since 2.0.0
      */
     public function setFile($file)
     {
@@ -105,6 +117,7 @@ class VaultSecretParams
      * Return secrets cache.
      *
      * @return CacheInterface
+     * @since 2.0.0
      */
     public function getCache()
     {
@@ -115,6 +128,7 @@ class VaultSecretParams
      * Set secrets cache.
      *
      * @param CacheInterface $cache
+     * @since 2.0.0
      */
     public function setCache($cache)
     {
@@ -125,6 +139,7 @@ class VaultSecretParams
      * Returns Vault token.
      *
      * @return string
+     * @since 2.0.0
      */
     public function getToken()
     {
@@ -135,6 +150,7 @@ class VaultSecretParams
      * Set Vault token.
      *
      * @param string $token
+     * @since 2.0.0
      */
     public function setToken($token)
     {
@@ -145,6 +161,7 @@ class VaultSecretParams
      * Is save template to file.
      *
      * @return bool
+     * @since 2.0.0
      */
     public function isIsSaveTemplate()
     {
@@ -155,6 +172,7 @@ class VaultSecretParams
      * Set is save template to a file.
      *
      * @param bool $isSaveTemplate
+     * @since 2.0.0
      */
     public function setIsSaveTemplate($isSaveTemplate)
     {
@@ -165,6 +183,7 @@ class VaultSecretParams
      * Get saved template's filename without extension.
      *
      * @return string
+     * @since 2.0.0
      */
     public function getSaveTemplateFilename()
     {
@@ -175,6 +194,7 @@ class VaultSecretParams
      * Set template's filename without extension to save to a file.
      *
      * @param string $saveTemplateFilename
+     * @since 2.0.0
      */
     public function setSaveTemplateFilename($saveTemplateFilename)
     {

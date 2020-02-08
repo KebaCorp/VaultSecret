@@ -12,6 +12,7 @@ namespace KebaCorp\VaultSecret\template;
  * Class TemplateAbstract.
  *
  * @package KebaCorp\VaultSecret\template
+ * @since 1.1.0
  */
 abstract class TemplateAbstract
 {
@@ -21,6 +22,7 @@ abstract class TemplateAbstract
      * @param string $key
      * @param array $data
      * @return mixed|null
+     * @since 2.0.0
      */
     abstract public function getSecret($key, $data);
 }

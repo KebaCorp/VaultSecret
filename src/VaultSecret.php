@@ -18,6 +18,7 @@ use KebaCorp\VaultSecret\template\TemplateCreator;
  * Read more about the component in README.md
  *
  * @package KebaCorp\VaultSecret
+ * @since 1.0.0
  */
 class VaultSecret
 {
@@ -25,6 +26,7 @@ class VaultSecret
      * Set VaultSecret params object.
      *
      * @param VaultSecretParams $vaultSecretParams
+     * @since 2.0.0
      */
     static public function setParams(VaultSecretParams $vaultSecretParams)
     {
@@ -53,6 +55,8 @@ class VaultSecret
      * Returns null if no secrets were found.
      *
      * @throws Exception
+     *
+     * @since 1.0.4
      */
     static public function getSecret($key, $url = null, $default = null, $type = TemplateCreator::TEMPLATE_KV2)
     {
@@ -81,6 +85,8 @@ class VaultSecret
      * Returns null if no secrets were found.
      *
      * @throws Exception
+     *
+     * @since 2.0.0
      */
     static public function getSecretFromJsonFile(
         $key,

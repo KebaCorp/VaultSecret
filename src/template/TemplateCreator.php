@@ -15,20 +15,30 @@ use KebaCorp\VaultSecret\template\templates\Kv2;
  * Class TemplateCreator.
  *
  * @package KebaCorp\VaultSecret
+ * @since 1.1.0
  */
 class TemplateCreator
 {
     /**
-     * Template types.
+     * Vault KV version 1 structure.
+     *
+     * @since 2.0.0
      */
-    const TEMPLATE_KV1 = 1; // Vault KV version 1 structure
-    const TEMPLATE_KV2 = 2; // Vault KV version 2 structure
+    const TEMPLATE_KV1 = 1;
+
+    /**
+     * Vault KV version 2 structure.
+     *
+     * @since 1.1.0
+     */
+    const TEMPLATE_KV2 = 2;
 
     /**
      * Create template.
      *
      * @param int $templateType
      * @return TemplateAbstract
+     * @since 1.1.0
      */
     static public function createTemplate($templateType = self::TEMPLATE_KV2)
     {

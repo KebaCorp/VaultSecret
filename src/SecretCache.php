@@ -15,6 +15,7 @@ use Psr\SimpleCache\CacheInterface;
  * Class SecretCache.
  *
  * @package KebaCorp\VaultSecret
+ * @since 2.0.0
  */
 class SecretCache implements CacheInterface
 {
@@ -22,6 +23,7 @@ class SecretCache implements CacheInterface
      * Secret cache instance.
      *
      * @var SecretCache
+     * @since 2.0.0
      */
     private static $instance;
 
@@ -29,6 +31,7 @@ class SecretCache implements CacheInterface
      * Cache data.
      *
      * @var array
+     * @since 2.0.0
      */
     private $_cache = array();
 
@@ -36,6 +39,7 @@ class SecretCache implements CacheInterface
      * Gets the instance via lazy initialization (created on first usage).
      *
      * @return SecretCache
+     * @since 2.0.0
      */
     public static function getInstance()
     {
@@ -51,6 +55,8 @@ class SecretCache implements CacheInterface
      *
      * Is not allowed to call from outside to prevent from creating multiple instances,
      * to use the singleton, you have to obtain the instance from Singleton::getInstance() instead.
+     *
+     * @since 2.0.0
      */
     private function __construct()
     {
@@ -58,6 +64,8 @@ class SecretCache implements CacheInterface
 
     /**
      * Prevent the instance from being cloned (which would create a second instance of it).
+     *
+     * @since 2.0.0
      */
     private function __clone()
     {
@@ -65,6 +73,8 @@ class SecretCache implements CacheInterface
 
     /**
      * Prevent from being unserialized (which would create a second instance of it).
+     *
+     * @since 2.0.0
      */
     private function __wakeup()
     {
@@ -79,6 +89,8 @@ class SecretCache implements CacheInterface
      * @return mixed The value of the item from the cache, or $default in case of cache miss.
      *
      * @throws InvalidArgumentException
+     *
+     * @since 2.0.0
      */
     public function get($key, $default = null)
     {
@@ -101,6 +113,8 @@ class SecretCache implements CacheInterface
      * @return bool True on success and false on failure.
      *
      * @throws InvalidArgumentException
+     *
+     * @since 2.0.0
      */
     public function set($key, $value, $ttl = null)
     {
@@ -121,6 +135,8 @@ class SecretCache implements CacheInterface
      * @return bool True if the item was successfully removed. False if there was an error.
      *
      * @throws InvalidArgumentException
+     *
+     * @since 2.0.0
      */
     public function delete($key)
     {
@@ -140,6 +156,7 @@ class SecretCache implements CacheInterface
      * Wipes clean the entire cache's keys.
      *
      * @return bool True on success and false on failure.
+     * @since 2.0.0
      */
     public function clear()
     {
@@ -160,6 +177,8 @@ class SecretCache implements CacheInterface
      * @return iterable A list of key => value pairs. Cache keys that do not exist or are stale will have $default as value.
      *
      * @throws InvalidArgumentException
+     *
+     * @since 2.0.0
      */
     public function getMultiple($keys, $default = null)
     {
@@ -185,6 +204,8 @@ class SecretCache implements CacheInterface
      * @return bool True on success and false on failure.
      *
      * @throws InvalidArgumentException
+     *
+     * @since 2.0.0
      */
     public function setMultiple($values, $ttl = null)
     {
@@ -208,6 +229,8 @@ class SecretCache implements CacheInterface
      * @return bool True if the items were successfully removed. False if there was an error.
      *
      * @throws InvalidArgumentException
+     *
+     * @since 2.0.0
      */
     public function deleteMultiple($keys)
     {
@@ -236,6 +259,8 @@ class SecretCache implements CacheInterface
      * @return bool
      *
      * @throws InvalidArgumentException
+     *
+     * @since 2.0.0
      */
     public function has($key)
     {
@@ -250,6 +275,7 @@ class SecretCache implements CacheInterface
      * Returns all cache data.
      *
      * @return array
+     * @since 2.0.0
      */
     public function getAllData()
     {
