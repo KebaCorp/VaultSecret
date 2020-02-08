@@ -10,6 +10,7 @@ namespace KebaCorp\VaultSecret;
 
 use Exception;
 use KebaCorp\VaultSecret\template\TemplateCreator;
+use Psr\SimpleCache\InvalidArgumentException;
 
 /**
  * Class VaultSecret.
@@ -36,7 +37,7 @@ class VaultSecret
     }
 
     /**
-     * Returns secret by key from Vault server.
+     * Returns secret by key from Vault service.
      *
      * @param string $key
      * Secret key.
@@ -53,6 +54,8 @@ class VaultSecret
      *
      * @return mixed|null
      * Returns null if no secrets were found.
+     *
+     * @throws InvalidArgumentException
      *
      * @throws Exception
      *
@@ -84,7 +87,7 @@ class VaultSecret
      * @return mixed|null
      * Returns null if no secrets were found.
      *
-     * @throws Exception
+     * @throws InvalidArgumentException
      *
      * @since 2.0.0
      */

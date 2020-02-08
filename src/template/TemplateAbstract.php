@@ -17,12 +17,68 @@ namespace KebaCorp\VaultSecret\template;
 abstract class TemplateAbstract
 {
     /**
+     * Secrets data.
+     *
+     * @var array
+     * @since 2.0.0
+     */
+    private $_data = array();
+
+    /**
      * Return secret by key from data.
      *
      * @param string $key
-     * @param array $data
      * @return mixed|null
      * @since 2.0.0
      */
-    abstract public function getSecret($key, $data);
+    abstract public function getSecret($key);
+
+    /**
+     * Returns json template string.
+     *
+     * @return string
+     * @since 1.1.0
+     */
+    abstract public function generateJsonTemplate();
+
+    /**
+     * Generate and save template json to files.
+     *
+     * @param string $filename
+     * @return bool
+     * @since 1.1.0
+     */
+    public function saveTemplateToFile($filename)
+    {
+        return !!file_put_contents($filename, $this->generateJsonTemplate());
+    }
+
+    /**
+     * Get secrets data.
+     *
+     * @return array
+     * @since 2.0.0
+     */
+    public function getData()
+    {
+        return $this->_data;
+    }
+
+    /**
+     * Set secrets data.
+     *
+     * @param array $data
+     * @return bool
+     * @since 2.0.0
+     */
+    public function setData($data)
+    {
+        if (is_array($data)) {
+            $this->_data = $data;
+
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -270,15 +270,4 @@ class SecretCache implements CacheInterface
 
         return isset($this->_cache[$key]);
     }
-
-    /**
-     * Returns all cache data.
-     *
-     * @return array
-     * @since 2.0.0
-     */
-    public function getAllData()
-    {
-        return $this->_cache;
-    }
 }

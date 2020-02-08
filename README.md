@@ -6,7 +6,7 @@
     <br>
 </p>
 
-The extension allows to **LOAD** the Vault secrets from Vault server or from json files and **GET** them.
+The extension allows to **LOAD** the Vault secrets from Vault service or from json files and **GET** them.
 
 For license information check the [LICENSE](LICENSE.md)-file.
 
@@ -62,7 +62,7 @@ VaultSecret::getSecretFromJsonFile('SECRET_KEY', 'path/secret.json');
 ```
 
 
-**Get secret from Vault server by KV2:**
+**Get secret from Vault service by KV2:**
 
 ```php
 <?php
@@ -75,12 +75,12 @@ $vaultSecretParams = new VaultSecretParams();
 $vaultSecretParams->setToken('vaultToken');
 VaultSecret::setParams($vaultSecretParams);
 
-// Get secret from Vault server
+// Get secret from Vault service
 VaultSecret::getSecret('SECRET_KEY', 'http://localhost:8200/v1/kv2/data/secretName');
 ```
 
 
-**Get secret from Vault server by KV1:**
+**Get secret from Vault service by KV1:**
 
 ```php
 <?php
@@ -94,7 +94,7 @@ $vaultSecretParams = new VaultSecretParams();
 $vaultSecretParams->setToken('vaultToken');
 VaultSecret::setParams($vaultSecretParams);
 
-// Get secret from Vault server
+// Get secret from Vault service
 VaultSecret::getSecret(
     'SECRET_KEY',
     'http://localhost:8200/v1/kv2/data/secretName',

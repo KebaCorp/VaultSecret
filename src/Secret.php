@@ -10,6 +10,7 @@ namespace KebaCorp\VaultSecret;
 
 use Exception;
 use KebaCorp\VaultSecret\template\TemplateCreator;
+use Psr\SimpleCache\InvalidArgumentException;
 
 /**
  * Class Secret.
@@ -106,7 +107,7 @@ class Secret
     }
 
     /**
-     * Returns secret by key from Vault server.
+     * Returns secret by key from Vault service.
      *
      * @param string $key
      * Secret key.
@@ -124,38 +125,15 @@ class Secret
      * @return mixed|null
      * Returns null if no secrets were found.
      *
+     * @throws InvalidArgumentException
+     *
      * @throws Exception
      *
      * @since 1.0.4
      */
     public function getSecret($key, $url = null, $default = null, $type = TemplateCreator::TEMPLATE_KV2)
     {
-        $secret = null;
-        $cache = SecretCache::getInstance();
-        $template = TemplateCreator::createTemplate($type);
-
-        // If the url is null, then the url will be taken from the VaultSecretParams
-        if ($url === null) {
-            $url = $this->_vaultSecretParams->getUrl();
-        }
-
-        if ($cache->has($url)) {
-            $secret = $template->getSecret($key, $cache->get($url));
-        } else {
-            $data = $this->_connectAndGetData($url);
-            if ($cache->set($url, $data)) {
-
-                // Generate and save template json to files
-                $this->_saveTemplate($cache);
-
-                $secret = $template->getSecret($key, $data);
-            }
-        }
-
-        // Generate and save template json to files
-        $this->_saveTemplate($cache);
-
-        return $secret === null ? $default : $secret;
+        return $this->_getOrLoadSecret($key, $url, $default, $type, false);
     }
 
     /**
@@ -177,62 +155,81 @@ class Secret
      * @return mixed|null
      * Returns null if no secrets were found.
      *
-     * @throws Exception
+     * @throws InvalidArgumentException
      *
      * @since 2.0.0
      */
     public function getSecretFromJsonFile($key, $file = null, $default = null, $type = TemplateCreator::TEMPLATE_KV2)
     {
+        return $this->_getOrLoadSecret($key, $file, $default, $type, true);
+    }
+
+    /**
+     * Returns secret by key from Vault service.
+     *
+     * @param string $key
+     * Secret key.
+     *
+     * @param string|null $source
+     * Default Vault url to secrets.
+     * If the url is null, then the url will be taken from the VaultSecretParams.
+     *
+     * @param mixed|null $default
+     * Returns the default value if the secret was not found.
+     *
+     * @param int $type
+     * Vault data parser template type.
+     *
+     * @param bool $isFromFile
+     * If true, then load data from file, else load data from Vault service.
+     *
+     * @return mixed|null
+     * Returns null if no secrets were found.
+     *
+     * @throws InvalidArgumentException
+     *
+     * @throws Exception
+     *
+     * @since 2.0.0
+     */
+    private function _getOrLoadSecret($key, $source, $default, $type, $isFromFile = false)
+    {
         $secret = null;
-        $cache = SecretCache::getInstance();
+        $cache = $this->_vaultSecretParams->getCache();
         $template = TemplateCreator::createTemplate($type);
 
-        // If the filename is null, then the filename will be taken from the VaultSecretParams
-        if ($file === null) {
-            $file = $this->_vaultSecretParams->getUrl();
+        // If the url or filename is null, then it will be taken from the VaultSecretParams
+        if ($source === null) {
+            $source = $isFromFile ? $this->_vaultSecretParams->getFile() : $this->_vaultSecretParams->getUrl();
         }
 
-        if ($cache->has($file)) {
-            $secret = $template->getSecret($key, $cache->get($file));
+        if ($cache->has($source)) {
+            $template->setData($cache->get($source));
+            $secret = $template->getSecret($key);
         } else {
-            if (file_exists($file)) {
-                $file = file_get_contents($file);
-                if ($data = json_decode($file, true)) {
-                    if ($cache->set($file, $data)) {
-
-                        // Generate and save template json to files
-                        $this->_saveTemplate($cache);
-
-                        $secret = $template->getSecret($key, $data);
-                    }
+            if ($isFromFile) {
+                // Load data from file
+                $data = array();
+                if (file_exists($source)) {
+                    $data = file_get_contents($source);
+                    $data = json_decode($data, true);
                 }
+            } else {
+                // Load data from url
+                $data = $this->_connectAndGetData($source);
+            }
+
+            if ($data && is_array($data) && $cache->set($source, $data)) {
+                $template->setData($data);
+                $template->saveTemplateToFile(
+                    $this->_vaultSecretParams->getSaveTemplateFilename()
+                    . '_' . basename($source, '.json') . '.json'
+                );
+                $secret = $template->getSecret($key);
             }
         }
 
         return $secret === null ? $default : $secret;
-    }
-
-    /**
-     * Generate and save template json to files.
-     *
-     * @param SecretCache $cache
-     * @return int Number of saved files
-     * @since 2.0.0
-     */
-    private function _saveTemplate($cache)
-    {
-        $fileCount = 0;
-
-        if ($this->_vaultSecretParams->isIsSaveTemplate()) {
-            foreach ($cache->getAllData() as $key => $datum) {
-                $fileCount += !!file_put_contents(
-                    $this->_vaultSecretParams->getSaveTemplateFilename() . '_' . ($fileCount + 1) . '.json',
-                    json_encode($datum, JSON_UNESCAPED_UNICODE | 128)
-                );
-            }
-        }
-
-        return $fileCount;
     }
 
     /**

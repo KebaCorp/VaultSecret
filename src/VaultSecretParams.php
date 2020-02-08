@@ -62,6 +62,7 @@ class VaultSecretParams
 
     /**
      * VaultSecretParams constructor.
+     *
      * @since 2.0.0
      */
     public function __construct()

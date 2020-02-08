@@ -7,6 +7,7 @@ require __DIR__ . '/../vendor/autoload.php';
 use KebaCorp\VaultSecret\template\TemplateCreator;
 use KebaCorp\VaultSecret\VaultSecret;
 use KebaCorp\VaultSecret\VaultSecretParams;
+use Psr\SimpleCache\InvalidArgumentException;
 
 // Set params
 $vaultSecretParams = new VaultSecretParams();
@@ -54,12 +55,25 @@ try {
         TemplateCreator::TEMPLATE_KV1
     ));
 
+    // KV1 from url test
+    echo "<b>KV1 from url test:</b>\n";
+    var_dump(VaultSecret::getSecret(
+        'username',
+        'http://vault:8200/v1/kvtest/mysql',
+        null,
+        TemplateCreator::TEMPLATE_KV1
+    ));
+
     echo "\n";
 
     // KV2 from url test
     echo "<b>KV2 from url test:</b>\n";
-    var_dump(VaultSecret::getSecret('mysqlPassword', 'http://vault:8200/v1/test/data/mysql'));
+    var_dump(VaultSecret::getSecret('password', 'http://vault:8200/v1/test/data/mongodb'));
 } catch (\Exception $e) {
+    echo $e->getMessage();
+    echo "\n";
+    echo $e->getTraceAsString();
+} catch (InvalidArgumentException $e) {
     echo $e->getMessage();
     echo "\n";
     echo $e->getTraceAsString();
