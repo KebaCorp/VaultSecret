@@ -13,20 +13,18 @@ use Psr\SimpleCache\CacheInterface;
 class VaultSecretParams
 {
     /**
-     * Default Vault url to secrets.
+     * Default Vault secrets data source.
+     *
+     * This may be a link to the Vault service.
+     * For example: 'http://localhost:8200/v1/kv2/data/secretName'.
+     *
+     * Or it could be the path to the json file.
+     * For example: 'path/secret.json'.
      *
      * @var string
      * @since 2.0.0
      */
-    private $_url;
-
-    /**
-     * Default path to json file with Vault secrets.
-     *
-     * @var string
-     * @since 2.0.0
-     */
-    private $_file;
+    private $_source;
 
     /**
      * Secrets cache.
@@ -71,47 +69,37 @@ class VaultSecretParams
     }
 
     /**
-     * Get default Vault url to secrets.
+     * Get default Vault secrets data source.
+     *
+     * This may be a link to the Vault service.
+     * For example: 'http://localhost:8200/v1/kv2/data/secretName'.
+     *
+     * Or it could be the path to the json file.
+     * For example: 'path/secret.json'.
      *
      * @return string
      * @since 2.0.0
      */
-    public function getUrl()
+    public function getSource()
     {
-        return $this->_url;
+        return $this->_source;
     }
 
     /**
-     * Set default Vault url to secrets.
+     * Set default Vault secrets data source.
      *
-     * @param string $url
+     * This may be a link to the Vault service.
+     * For example: 'http://localhost:8200/v1/kv2/data/secretName'.
+     *
+     * Or it could be the path to the json file.
+     * For example: 'path/secret.json'.
+     *
+     * @param string $source
      * @since 2.0.0
      */
-    public function setUrl($url)
+    public function setSource($source)
     {
-        $this->_url = $url;
-    }
-
-    /**
-     * Get default path to json file with Vault secrets.
-     *
-     * @return string
-     * @since 2.0.0
-     */
-    public function getFile()
-    {
-        return $this->_file;
-    }
-
-    /**
-     * Set default path to json file with Vault secrets.
-     *
-     * @param string $file
-     * @since 2.0.0
-     */
-    public function setFile($file)
-    {
-        $this->_file = $file;
+        $this->_source = $source;
     }
 
     /**
@@ -177,7 +165,7 @@ class VaultSecretParams
      */
     public function setIsSaveTemplate($isSaveTemplate)
     {
-        $this->_isSaveTemplate = $isSaveTemplate;
+        $this->_isSaveTemplate = (bool)$isSaveTemplate;
     }
 
     /**
@@ -195,10 +183,17 @@ class VaultSecretParams
      * Set template's filename without extension to save to a file.
      *
      * @param string $saveTemplateFilename
+     * @return bool
      * @since 2.0.0
      */
     public function setSaveTemplateFilename($saveTemplateFilename)
     {
-        $this->_saveTemplateFilename = $saveTemplateFilename;
+        if (is_string($saveTemplateFilename)) {
+            $this->_saveTemplateFilename = $saveTemplateFilename;
+
+            return true;
+        }
+
+        return false;
     }
 }

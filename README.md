@@ -50,15 +50,15 @@ Usage
 -----
 
 
-**Get secret from json file:**
+**Get secret from file that contains json string:**
 
 ```php
 <?php
 
 use KebaCorp\VaultSecret\VaultSecret;
 
-// Get secret from json file
-VaultSecret::getSecretFromJsonFile('SECRET_KEY', 'path/secret.json');
+// Get secret from file that contains json string
+VaultSecret::getSecret('SECRET_KEY', 'path/secret.json');
 ```
 
 
@@ -152,8 +152,9 @@ VaultSecret::setParams($vaultSecretParams);
 ```
 
 
-**Set default Vault url to secrets:**
+**Set default Vault source to secrets:**
 
+*This may be a link to the Vault service. For example: ```'http://localhost:8200/v1/kv2/data/secretName'```*
 ```php
 <?php
 
@@ -161,13 +162,11 @@ use KebaCorp\VaultSecret\VaultSecret;
 use KebaCorp\VaultSecret\VaultSecretParams;
 
 $vaultSecretParams = new VaultSecretParams();
-$vaultSecretParams->setUrl('http://localhost:8200/v1/kv2/data/secretName');
+$vaultSecretParams->setSource('http://localhost:8200/v1/kv2/data/secretName');
 VaultSecret::setParams($vaultSecretParams);
 ```
 
-
-**Set default path to json file with Vault secrets:**
-
+*Or it could be the path to the json file. For example: ```'path/secret.json'```*
 ```php
 <?php
 
@@ -175,7 +174,7 @@ use KebaCorp\VaultSecret\VaultSecret;
 use KebaCorp\VaultSecret\VaultSecretParams;
 
 $vaultSecretParams = new VaultSecretParams();
-$vaultSecretParams->setFile('path/secret.json');
+$vaultSecretParams->setSource('path/secret.json');
 VaultSecret::setParams($vaultSecretParams);
 ```
 
@@ -189,6 +188,6 @@ use KebaCorp\VaultSecret\VaultSecret;
 use KebaCorp\VaultSecret\VaultSecretParams;
 
 $vaultSecretParams = new VaultSecretParams();
-$vaultSecretParams->setCache($myCache);
+$vaultSecretParams->setCache($myCacheObject);
 VaultSecret::setParams($vaultSecretParams);
 ```

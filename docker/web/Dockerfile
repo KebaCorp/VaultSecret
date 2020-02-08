@@ -1,4 +1,4 @@
-FROM php:7.1-apache
+FROM php:5.3-apache
 
 # Install extensions
 RUN apt-get update && apt-get install -y --force-yes \

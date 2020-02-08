@@ -25,7 +25,7 @@ echo "<pre>";
 try {
     // KV1 from file test
     echo "<b>KV1 from file test:</b>\n";
-    var_dump(VaultSecret::getSecretFromJsonFile(
+    var_dump(VaultSecret::getSecret(
         'password',
         $secretsFilename1,
         6667,
@@ -36,17 +36,17 @@ try {
 
     // KV2 from file test
     echo "<b>KV2 from file test:</b>\n";
-    var_dump(VaultSecret::getSecretFromJsonFile('MYSQL_DB_USER', $secretsFilename2));
+    var_dump(VaultSecret::getSecret('MYSQL_DB_USER', $secretsFilename2));
 
     echo "\n";
 
     // KV2 from file test
     echo "<b>KV2 from file test:</b>\n";
-    var_dump(VaultSecret::getSecretFromJsonFile('MYSQL_DB_USER', $secretsFilename3));
+    var_dump(VaultSecret::getSecret('MYSQL_DB_USER', $secretsFilename3));
 
     echo "\n";
 
-    // KV1 from url test
+    // KV1 by url test
     echo "<b>KV1 from url test:</b>\n";
     var_dump(VaultSecret::getSecret(
         'password',
@@ -55,7 +55,7 @@ try {
         TemplateCreator::TEMPLATE_KV1
     ));
 
-    // KV1 from url test
+    // KV1 by url test
     echo "<b>KV1 from url test:</b>\n";
     var_dump(VaultSecret::getSecret(
         'username',
@@ -66,7 +66,7 @@ try {
 
     echo "\n";
 
-    // KV2 from url test
+    // KV2 by url test
     echo "<b>KV2 from url test:</b>\n";
     var_dump(VaultSecret::getSecret('password', 'http://vault:8200/v1/test/data/mongodb'));
 } catch (\Exception $e) {

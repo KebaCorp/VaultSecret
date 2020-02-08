@@ -8,7 +8,6 @@
 
 namespace KebaCorp\VaultSecret;
 
-use Exception;
 use KebaCorp\VaultSecret\template\TemplateCreator;
 use Psr\SimpleCache\InvalidArgumentException;
 
@@ -37,14 +36,14 @@ class VaultSecret
     }
 
     /**
-     * Returns secret by key from Vault service.
+     * Get secret by key from Vault service or from file.
      *
      * @param string $key
      * Secret key.
      *
-     * @param string|null $url
-     * Default Vault url to secrets.
-     * If the url is null, then the url will be taken from the VaultSecretParams.
+     * @param string|null $source
+     * Default Vault secrets data source.
+     * If the source is null, then it will be taken from the VaultSecretParams.
      *
      * @param mixed|null $default
      * Returns the default value if the secret was not found.
@@ -56,49 +55,13 @@ class VaultSecret
      * Returns null if no secrets were found.
      *
      * @throws InvalidArgumentException
-     *
-     * @throws Exception
      *
      * @since 1.0.4
      */
-    static public function getSecret($key, $url = null, $default = null, $type = TemplateCreator::TEMPLATE_KV2)
+    static public function getSecret($key, $source = null, $default = null, $type = TemplateCreator::TEMPLATE_KV2)
     {
         $secret = Secret::getInstance();
 
-        return $secret->getSecret($key, $url, $default, $type);
-    }
-
-    /**
-     * Returns secret by key from json file.
-     *
-     * @param string $key
-     * Secret key.
-     *
-     * @param string|null $file
-     * Default path to json file with Vault secrets.
-     * If the filename is null, then the filename will be taken from the VaultSecretParams.
-     *
-     * @param mixed|null $default
-     * Returns the default value if the secret was not found.
-     *
-     * @param int $type
-     * Vault data parser template type.
-     *
-     * @return mixed|null
-     * Returns null if no secrets were found.
-     *
-     * @throws InvalidArgumentException
-     *
-     * @since 2.0.0
-     */
-    static public function getSecretFromJsonFile(
-        $key,
-        $file = null,
-        $default = null,
-        $type = TemplateCreator::TEMPLATE_KV2
-    ) {
-        $secret = Secret::getInstance();
-
-        return $secret->getSecretFromJsonFile($key, $file, $default, $type);
+        return $secret->getSecret($key, $source, $default, $type);
     }
 }

@@ -8,7 +8,6 @@
 
 namespace KebaCorp\VaultSecret;
 
-use Exception;
 use KebaCorp\VaultSecret\template\TemplateCreator;
 use Psr\SimpleCache\InvalidArgumentException;
 
@@ -107,72 +106,14 @@ class Secret
     }
 
     /**
-     * Returns secret by key from Vault service.
-     *
-     * @param string $key
-     * Secret key.
-     *
-     * @param string|null $url
-     * Default Vault url to secrets.
-     * If the url is null, then the url will be taken from the VaultSecretParams.
-     *
-     * @param mixed|null $default
-     * Returns the default value if the secret was not found.
-     *
-     * @param int $type
-     * Vault data parser template type.
-     *
-     * @return mixed|null
-     * Returns null if no secrets were found.
-     *
-     * @throws InvalidArgumentException
-     *
-     * @throws Exception
-     *
-     * @since 1.0.4
-     */
-    public function getSecret($key, $url = null, $default = null, $type = TemplateCreator::TEMPLATE_KV2)
-    {
-        return $this->_getOrLoadSecret($key, $url, $default, $type, false);
-    }
-
-    /**
-     * Returns secret by key from json file.
-     *
-     * @param string $key
-     * Secret key.
-     *
-     * @param string|null $file
-     * Default path to json file with Vault secrets.
-     * If the filename is null, then the filename will be taken from the VaultSecretParams.
-     *
-     * @param mixed|null $default
-     * Returns the default value if the secret was not found.
-     *
-     * @param int $type
-     * Vault data parser template type.
-     *
-     * @return mixed|null
-     * Returns null if no secrets were found.
-     *
-     * @throws InvalidArgumentException
-     *
-     * @since 2.0.0
-     */
-    public function getSecretFromJsonFile($key, $file = null, $default = null, $type = TemplateCreator::TEMPLATE_KV2)
-    {
-        return $this->_getOrLoadSecret($key, $file, $default, $type, true);
-    }
-
-    /**
-     * Returns secret by key from Vault service.
+     * Get secret by key from Vault service or from file.
      *
      * @param string $key
      * Secret key.
      *
      * @param string|null $source
-     * Default Vault url to secrets.
-     * If the url is null, then the url will be taken from the VaultSecretParams.
+     * Default Vault secrets data source.
+     * If the source is null, then it will be taken from the VaultSecretParams.
      *
      * @param mixed|null $default
      * Returns the default value if the secret was not found.
@@ -180,87 +121,53 @@ class Secret
      * @param int $type
      * Vault data parser template type.
      *
-     * @param bool $isFromFile
-     * If true, then load data from file, else load data from Vault service.
-     *
      * @return mixed|null
      * Returns null if no secrets were found.
      *
      * @throws InvalidArgumentException
      *
-     * @throws Exception
-     *
-     * @since 2.0.0
+     * @since 1.0.4
      */
-    private function _getOrLoadSecret($key, $source, $default, $type, $isFromFile = false)
+    public function getSecret($key, $source = null, $default = null, $type = TemplateCreator::TEMPLATE_KV2)
     {
         $secret = null;
         $cache = $this->_vaultSecretParams->getCache();
         $template = TemplateCreator::createTemplate($type);
 
-        // If the url or filename is null, then it will be taken from the VaultSecretParams
+        // If the source is null, then it will be taken from the VaultSecretParams
         if ($source === null) {
-            $source = $isFromFile ? $this->_vaultSecretParams->getFile() : $this->_vaultSecretParams->getUrl();
+            $source = $this->_vaultSecretParams->getSource();
         }
 
         if ($cache->has($source)) {
             $template->setData($cache->get($source));
             $secret = $template->getSecret($key);
         } else {
-            if ($isFromFile) {
-                // Load data from file
-                $data = array();
-                if (file_exists($source)) {
-                    $data = file_get_contents($source);
-                    $data = json_decode($data, true);
-                }
-            } else {
-                // Load data from url
-                $data = $this->_connectAndGetData($source);
-            }
+            // Load data from source
+            $opts = array(
+                'http' => array(
+                    'method' => "GET",
+                    'header' => "Authorization: Bearer {$this->_vaultSecretParams->getToken()}\r\n" .
+                        "Content-Type: application/json\r\n",
+                )
+            );
+            $context = stream_context_create($opts);
+            if ($content = file_get_contents($source, false, $context)) {
+                if (($data = json_decode($content, true)) && is_array($data) && $cache->set($source, $data)) {
+                    $template->setData($data);
+                    $secret = $template->getSecret($key);
 
-            if ($data && is_array($data) && $cache->set($source, $data)) {
-                $template->setData($data);
-                $template->saveTemplateToFile(
-                    $this->_vaultSecretParams->getSaveTemplateFilename()
-                    . '_' . basename($source, '.json') . '.json'
-                );
-                $secret = $template->getSecret($key);
+                    // Save template to file
+                    if ($this->_vaultSecretParams->isIsSaveTemplate()) {
+                        $template->saveTemplateToFile(
+                            $this->_vaultSecretParams->getSaveTemplateFilename()
+                            . '_' . basename($source, '.json') . '.json'
+                        );
+                    }
+                }
             }
         }
 
         return $secret === null ? $default : $secret;
-    }
-
-    /**
-     * Connect to Vault service and get array data by url.
-     *
-     * @param string $url
-     * @return array
-     * @throws Exception
-     * @since 2.0.0
-     */
-    private function _connectAndGetData($url)
-    {
-        $ch = curl_init($url);
-
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            "Authorization: Bearer {$this->_vaultSecretParams->getToken()}",
-            'Content-Type: application/json',
-        ));
-
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        $result = curl_exec($ch);
-
-        if (curl_error($ch) || $result === false) {
-            throw new Exception(curl_error($ch));
-        }
-
-        curl_close($ch);
-
-        $data = json_decode($result, true, JSON_UNESCAPED_UNICODE);
-
-        return is_array($data) ? $data : array();
     }
 }
