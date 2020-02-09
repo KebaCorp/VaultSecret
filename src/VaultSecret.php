@@ -8,6 +8,8 @@
 
 namespace KebaCorp\VaultSecret;
 
+use Psr\SimpleCache\InvalidArgumentException;
+
 /**
  * Class VaultSecret.
  *
@@ -15,43 +17,64 @@ namespace KebaCorp\VaultSecret;
  * Read more about the component in README.md
  *
  * @package KebaCorp\VaultSecret
+ * @since 1.0.0
  */
 class VaultSecret
 {
     /**
-     * Loads json secret file.
+     * Vault KV version 1 structure.
      *
-     * @param string $secretFileName
-     * @param array $options
-     * @return bool
+     * @since 2.0.0
      */
-    static public function load($secretFileName, $options = array())
+    const TEMPLATE_TYPE_KV1 = 1;
+
+    /**
+     * Vault KV version 2 structure.
+     *
+     * @since 2.0.0
+     */
+    const TEMPLATE_TYPE_KV2 = 2;
+
+    /**
+     * Set VaultSecret params object.
+     *
+     * @param VaultSecretParams $vaultSecretParams
+     * @since 2.0.0
+     */
+    static public function setParams(VaultSecretParams $vaultSecretParams)
     {
         $secret = Secret::getInstance();
-        return $secret->load($secretFileName, $options);
+
+        $secret->setVaultSecretParams($vaultSecretParams);
     }
 
     /**
-     * Returns secret by key.
+     * Get secret by key from Vault service or from file.
      *
-     * @param $key
-     * @param string $default
-     * @return string
+     * @param string $key
+     * Secret key.
+     *
+     * @param string|null $source
+     * Default Vault secrets data source.
+     * If the source is null, then it will be taken from the VaultSecretParams.
+     *
+     * @param mixed|null $default
+     * Returns the default value if the secret was not found.
+     *
+     * @param int $type
+     * Vault data parser template type.
+     *
+     * @return mixed|null
+     * Returns null if no secrets were found.
+     *
+     * @throws InvalidArgumentException
+     *
+     * @since 1.0.4
      */
-    static public function getSecret($key, $default = '')
+    static public function getSecret($key, $source = null, $default = null, $type = self::TEMPLATE_TYPE_KV2)
     {
         $secret = Secret::getInstance();
-        return $secret->getSecret($key, $default);
-    }
 
-    /**
-     * Returns secret DTO.
-     *
-     * @return SecretDTO
-     */
-    static public function getSecretDto()
-    {
-        $secret = Secret::getInstance();
-        return $secret->getSecretDto();
+        return $secret->getSecret($key, $source, $default, $type);
     }
 }

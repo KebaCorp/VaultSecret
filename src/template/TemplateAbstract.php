@@ -8,40 +8,77 @@
 
 namespace KebaCorp\VaultSecret\template;
 
-use KebaCorp\VaultSecret\SecretDTO;
-
 /**
  * Class TemplateAbstract.
  *
  * @package KebaCorp\VaultSecret\template
+ * @since 1.1.0
  */
 abstract class TemplateAbstract
 {
     /**
-     * Parse and return secret array data.
+     * Secrets data.
      *
-     * @param string $secretFileName
-     * @return array
+     * @var array
+     * @since 2.0.0
      */
-    abstract public function parseJson($secretFileName);
+    private $_data = array();
+
+    /**
+     * Return secret by key from data.
+     *
+     * @param string $key
+     * @return mixed|null
+     * @since 2.0.0
+     */
+    abstract public function getSecret($key);
 
     /**
      * Returns json template string.
      *
-     * @param SecretDTO $secretDto
      * @return string
+     * @since 1.1.0
      */
-    abstract public function generateJsonTemplate(SecretDTO $secretDto);
+    abstract public function generateJsonTemplate();
 
     /**
-     * Save template to file.
+     * Generate and save template json to files.
      *
-     * @param $filename
-     * @param SecretDTO $secretDto
+     * @param string $filename
      * @return bool
+     * @since 1.1.0
      */
-    public function saveTemplateToFile($filename, SecretDTO $secretDto)
+    public function saveTemplateToFile($filename)
     {
-        return !!file_put_contents($filename, $this->generateJsonTemplate($secretDto));
+        return !!file_put_contents($filename, $this->generateJsonTemplate());
+    }
+
+    /**
+     * Get secrets data.
+     *
+     * @return array
+     * @since 2.0.0
+     */
+    public function getData()
+    {
+        return $this->_data;
+    }
+
+    /**
+     * Set secrets data.
+     *
+     * @param array $data
+     * @return bool
+     * @since 2.0.0
+     */
+    public function setData($data)
+    {
+        if (is_array($data)) {
+            $this->_data = $data;
+
+            return true;
+        }
+
+        return false;
     }
 }

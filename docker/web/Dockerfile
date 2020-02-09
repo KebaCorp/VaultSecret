@@ -1,6 +1,7 @@
-FROM php:7.1-apache
+FROM php:5.3-apache
 
-RUN apt-get update && apt-get install -y \
+# Install extensions
+RUN apt-get update && apt-get install -y --force-yes \
         curl \
         wget \
         git \
@@ -23,25 +24,7 @@ RUN apt-get update && apt-get install -y \
         apt-get install \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
-        libpng-dev \
-    && docker-php-ext-configure \
-        gd \
-    && docker-php-ext-install \
-        gd \
-        mcrypt \
-        mbstring \
-        mysqli \
-        pdo_mysql \
-        zip \
-    && pecl install \
-        apcu_bc
+        libpng-dev -y --force-yes
 
-#Composer
-RUN curl -sS https://getcomposer.org/installer | php -- \
-        --filename=composer \
-        --install-dir=/usr/local/bin && \
-        echo "alias composer='composer'" >> /root/.bashrc && \
-        composer
-
-#Php.ini
-ADD php.ini /usr/local/etc/php
+# Php.ini
+ADD php.ini /usr/local/lib

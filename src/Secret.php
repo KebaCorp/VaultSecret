@@ -8,8 +8,8 @@
 
 namespace KebaCorp\VaultSecret;
 
-use KebaCorp\VaultSecret\template\TemplateAbstract;
 use KebaCorp\VaultSecret\template\TemplateCreator;
+use Psr\SimpleCache\InvalidArgumentException;
 
 /**
  * Class Secret.
@@ -17,43 +17,36 @@ use KebaCorp\VaultSecret\template\TemplateCreator;
  * Singleton to load secret files.
  *
  * @package KebaCorp\VaultSecret
+ * @since 1.0.3
  */
 class Secret
 {
     /**
-     * Default generated template's filename.
-     */
-    const GENERATED_TEMPLATE_FILENAME = 'secretsTemplate.json';
-
-    /**
+     * Secret instance.
+     *
      * @var Secret
+     * @since 1.0.3
      */
     private static $instance;
 
     /**
-     * Secrets DTO.
+     * Vault secret params.
      *
-     * @var SecretDTO
+     * @var VaultSecretParams
+     * @since 2.0.0
      */
-    private $_secretDto;
-
-    /**
-     * Template.
-     *
-     * @var TemplateAbstract
-     */
-    private $_template;
+    private $_vaultSecretParams;
 
     /**
      * Gets the instance via lazy initialization (created on first usage).
      *
-     * @param int $templateType
      * @return Secret
+     * @since 1.0.3
      */
-    public static function getInstance($templateType = TemplateCreator::TEMPLATE_KV2)
+    public static function getInstance()
     {
         if (null === static::$instance) {
-            static::$instance = new static($templateType);
+            static::$instance = new static();
         }
 
         return static::$instance;
@@ -65,16 +58,17 @@ class Secret
      * Is not allowed to call from outside to prevent from creating multiple instances,
      * to use the singleton, you have to obtain the instance from Singleton::getInstance() instead.
      *
-     * @param int $templateType
+     * @since 1.0.3
      */
-    private function __construct($templateType = TemplateCreator::TEMPLATE_KV2)
+    private function __construct()
     {
-        $this->_secretDto = new SecretDTO();
-        $this->_template = TemplateCreator::createTemplate($templateType);
+        $this->_vaultSecretParams = new VaultSecretParams();
     }
 
     /**
      * Prevent the instance from being cloned (which would create a second instance of it).
+     *
+     * @since 1.0.3
      */
     private function __clone()
     {
@@ -82,66 +76,100 @@ class Secret
 
     /**
      * Prevent from being unserialized (which would create a second instance of it).
+     *
+     * @since 1.0.3
      */
     private function __wakeup()
     {
     }
 
     /**
-     * Loads json secret file.
+     * Get VaultSecret params object.
      *
-     * @param string $secretFileName
-     * @param array $options
-     * @return bool
+     * @return VaultSecretParams
+     * @since 2.0.0
      */
-    public function load($secretFileName, $options = array())
+    public function getVaultSecretParams()
     {
-        if ($secrets = $this->_template->parseJson($secretFileName)) {
-            $this->_secretDto->secrets = array_merge($this->_secretDto->secrets, $secrets);
+        return $this->_vaultSecretParams;
+    }
 
-            // Apply passed options
-            $this->_applyOptions($options);
+    /**
+     * Set VaultSecret params object.
+     *
+     * @param VaultSecretParams $vaultSecretParams
+     * @since 2.0.0
+     */
+    public function setVaultSecretParams($vaultSecretParams)
+    {
+        $this->_vaultSecretParams = $vaultSecretParams;
+    }
+
+    /**
+     * Get secret by key from Vault service or from file.
+     *
+     * @param string $key
+     * Secret key.
+     *
+     * @param string|null $source
+     * Default Vault secrets data source.
+     * If the source is null, then it will be taken from the VaultSecretParams.
+     *
+     * @param mixed|null $default
+     * Returns the default value if the secret was not found.
+     *
+     * @param int $type
+     * Vault data parser template type.
+     *
+     * @return mixed|null
+     * Returns null if no secrets were found.
+     *
+     * @throws InvalidArgumentException
+     *
+     * @since 1.0.4
+     */
+    public function getSecret($key, $source = null, $default = null, $type = VaultSecret::TEMPLATE_TYPE_KV2)
+    {
+        $sourceKey = base64_encode($source);
+
+        $secret = null;
+        $cache = $this->_vaultSecretParams->getCache();
+        $template = TemplateCreator::createTemplate($type);
+
+        // If the source is null, then it will be taken from the VaultSecretParams
+        if ($source === null) {
+            $source = $this->_vaultSecretParams->getSource();
         }
 
-        return false;
-    }
-
-    /**
-     * Returns secret by key.
-     *
-     * @param $key
-     * @param string $default
-     * @return string
-     */
-    public function getSecret($key, $default = '')
-    {
-        return isset($this->_secretDto->secrets[$key]) ? $this->_secretDto->secrets[$key] : $default;
-    }
-
-    /**
-     * Returns secret DTO.
-     *
-     * @return SecretDTO
-     */
-    public function getSecretDto()
-    {
-        return $this->_secretDto;
-    }
-
-    /**
-     * Apply passed options.
-     *
-     * @param $options
-     */
-    private function _applyOptions($options)
-    {
-        // Save template
-        $isSaveTemplate = isset($options['saveTemplate']) ? $options['saveTemplate'] : true;
-        if ($isSaveTemplate) {
-            $filename = isset($options['saveTemplateFilename'])
-                ? $options['saveTemplateFilename']
-                : self::GENERATED_TEMPLATE_FILENAME;
-            $this->_template->saveTemplateToFile($filename, $this->getSecretDto());
+        if ($cache->has($sourceKey)) {
+            $template->setData($cache->get($sourceKey));
+            $secret = $template->getSecret($key);
+        } else {
+            // Load data from source
+            $options = array(
+                'http' => array(
+                    'method' => "GET",
+                    'header' => "Authorization: Bearer {$this->_vaultSecretParams->getToken()}\r\n" .
+                        "Content-Type: application/json\r\n",
+                )
+            );
+            $context = stream_context_create($options);
+            if ($content = file_get_contents($source, false, $context)) {
+                if (($data = json_decode($content, true)) && is_array($data) && $cache->set($sourceKey, $data)) {
+                    $template->setData($data);
+                    $secret = $template->getSecret($key);
+                }
+            }
         }
+
+        // Save template to file
+        if ($this->_vaultSecretParams->isIsSaveTemplate()) {
+            $template->saveTemplateToFile(
+                $this->_vaultSecretParams->getSaveTemplateFilename()
+                . '_' . $sourceKey . '.json'
+            );
+        }
+
+        return $secret === null ? $default : $secret;
     }
 }
