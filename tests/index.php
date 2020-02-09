@@ -4,10 +4,11 @@ namespace app\tests;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use KebaCorp\VaultSecret\template\TemplateCreator;
 use KebaCorp\VaultSecret\VaultSecret;
 use KebaCorp\VaultSecret\VaultSecretParams;
 use Psr\SimpleCache\InvalidArgumentException;
+
+$startTime = microtime(true);
 
 // Set params
 $vaultSecretParams = new VaultSecretParams();
@@ -29,7 +30,7 @@ try {
         'password',
         $secretsFilename1,
         6667,
-        TemplateCreator::TEMPLATE_KV1
+        VaultSecret::TEMPLATE_TYPE_KV1
     ));
 
     echo "\n";
@@ -52,7 +53,7 @@ try {
         'password',
         'http://vault:8200/v1/kvtest/mysql',
         null,
-        TemplateCreator::TEMPLATE_KV1
+        VaultSecret::TEMPLATE_TYPE_KV1
     ));
 
     // KV1 by url test
@@ -61,7 +62,7 @@ try {
         'username',
         'http://vault:8200/v1/kvtest/mysql',
         null,
-        TemplateCreator::TEMPLATE_KV1
+        VaultSecret::TEMPLATE_TYPE_KV1
     ));
 
     echo "\n";
@@ -78,5 +79,8 @@ try {
     echo "\n";
     echo $e->getTraceAsString();
 }
+
+echo "\n";
+echo 'Execution time: ' . (microtime(true) - $startTime) . ' seconds.';
 
 exit;

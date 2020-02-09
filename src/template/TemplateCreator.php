@@ -10,6 +10,7 @@ namespace KebaCorp\VaultSecret\template;
 
 use KebaCorp\VaultSecret\template\templates\Kv1;
 use KebaCorp\VaultSecret\template\templates\Kv2;
+use KebaCorp\VaultSecret\VaultSecret;
 
 /**
  * Class TemplateCreator.
@@ -20,30 +21,16 @@ use KebaCorp\VaultSecret\template\templates\Kv2;
 class TemplateCreator
 {
     /**
-     * Vault KV version 1 structure.
-     *
-     * @since 2.0.0
-     */
-    const TEMPLATE_KV1 = 1;
-
-    /**
-     * Vault KV version 2 structure.
-     *
-     * @since 1.1.0
-     */
-    const TEMPLATE_KV2 = 2;
-
-    /**
      * Create template.
      *
      * @param int $templateType
      * @return TemplateAbstract
      * @since 1.1.0
      */
-    static public function createTemplate($templateType = self::TEMPLATE_KV2)
+    static public function createTemplate($templateType = VaultSecret::TEMPLATE_TYPE_KV2)
     {
         switch ($templateType) {
-            case self::TEMPLATE_KV1:
+            case VaultSecret::TEMPLATE_TYPE_KV1:
                 return new Kv1();
 
             default:

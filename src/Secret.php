@@ -128,8 +128,10 @@ class Secret
      *
      * @since 1.0.4
      */
-    public function getSecret($key, $source = null, $default = null, $type = TemplateCreator::TEMPLATE_KV2)
+    public function getSecret($key, $source = null, $default = null, $type = VaultSecret::TEMPLATE_TYPE_KV2)
     {
+        $sourceKey = base64_encode($source);
+
         $secret = null;
         $cache = $this->_vaultSecretParams->getCache();
         $template = TemplateCreator::createTemplate($type);
@@ -139,33 +141,33 @@ class Secret
             $source = $this->_vaultSecretParams->getSource();
         }
 
-        if ($cache->has($source)) {
-            $template->setData($cache->get($source));
+        if ($cache->has($sourceKey)) {
+            $template->setData($cache->get($sourceKey));
             $secret = $template->getSecret($key);
         } else {
             // Load data from source
-            $opts = array(
+            $options = array(
                 'http' => array(
                     'method' => "GET",
                     'header' => "Authorization: Bearer {$this->_vaultSecretParams->getToken()}\r\n" .
                         "Content-Type: application/json\r\n",
                 )
             );
-            $context = stream_context_create($opts);
+            $context = stream_context_create($options);
             if ($content = file_get_contents($source, false, $context)) {
-                if (($data = json_decode($content, true)) && is_array($data) && $cache->set($source, $data)) {
+                if (($data = json_decode($content, true)) && is_array($data) && $cache->set($sourceKey, $data)) {
                     $template->setData($data);
                     $secret = $template->getSecret($key);
-
-                    // Save template to file
-                    if ($this->_vaultSecretParams->isIsSaveTemplate()) {
-                        $template->saveTemplateToFile(
-                            $this->_vaultSecretParams->getSaveTemplateFilename()
-                            . '_' . basename($source, '.json') . '.json'
-                        );
-                    }
                 }
             }
+        }
+
+        // Save template to file
+        if ($this->_vaultSecretParams->isIsSaveTemplate()) {
+            $template->saveTemplateToFile(
+                $this->_vaultSecretParams->getSaveTemplateFilename()
+                . '_' . $sourceKey . '.json'
+            );
         }
 
         return $secret === null ? $default : $secret;

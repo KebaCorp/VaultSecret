@@ -181,7 +181,12 @@ VaultSecret::setParams($vaultSecretParams);
 
 **Set your own cache object:**
 
-*SecretHybridCache is used by default.*
+*You can use any cache inherited from the class that implements ```CacheInterface```.*
+
+*```SecretHybridCache``` is used by default.*
+
+*There is also a ```SecretMemoryCache``` that stores data in RAM, but it is stored only during client connection. 
+So each time they require load data from a source of secrets.*
 ```php
 <?php
 

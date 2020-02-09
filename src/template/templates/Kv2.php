@@ -52,6 +52,6 @@ class Kv2 extends TemplateAbstract
             }
         }
 
-        return json_encode($result, JSON_UNESCAPED_UNICODE | 128);
+        return json_encode($result, 256 | 128);
     }
 }

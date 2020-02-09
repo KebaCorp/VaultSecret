@@ -28,6 +28,7 @@ phpunit.phar
 
 tests/_output/*
 tests/_support/_generated
+tests/vault_cache.json
 
 #vagrant folder
 /.vagrant

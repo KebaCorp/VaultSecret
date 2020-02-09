@@ -24,11 +24,11 @@ class SecretHybridCache implements CacheInterface
      *
      * @since 2.0.0
      */
-    const DEFAULT_FILE = '/secrets/vault_cache';
+    const DEFAULT_FILE = 'vault_cache.json';
 
     /**
      * Cache file.
-     * For example: '/secrets/vault_cache'.
+     * For example: '/secrets/vault_cache.json'.
      *
      * @var string
      * @since 2.0.0
@@ -56,7 +56,7 @@ class SecretHybridCache implements CacheInterface
      *
      * @param string $file
      * Cache file.
-     * For example: '/secrets/vault_cache'.
+     * For example: '/secrets/vault_cache.json'.
      *
      * @return SecretHybridCache
      *
@@ -79,7 +79,7 @@ class SecretHybridCache implements CacheInterface
      *
      * @param $file
      * Cache file.
-     * For example: '/secrets/vault_cache'.
+     * For example: '/secrets/vault_cache.json'.
      *
      * @since 2.0.0
      */
@@ -87,7 +87,7 @@ class SecretHybridCache implements CacheInterface
     {
         // Set cache file
         if (is_string($file) && $file) {
-            $this->_cache = $file;
+            $this->_file = $file;
         }
 
         // Load cache from file
@@ -339,6 +339,6 @@ class SecretHybridCache implements CacheInterface
      */
     private function _saveCacheToFile()
     {
-        return !!file_put_contents($this->_file, json_encode($this->_cache, JSON_UNESCAPED_UNICODE));
+        return !!file_put_contents($this->_file, json_encode($this->_cache, 256));
     }
 }

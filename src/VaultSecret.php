@@ -8,7 +8,6 @@
 
 namespace KebaCorp\VaultSecret;
 
-use KebaCorp\VaultSecret\template\TemplateCreator;
 use Psr\SimpleCache\InvalidArgumentException;
 
 /**
@@ -22,6 +21,20 @@ use Psr\SimpleCache\InvalidArgumentException;
  */
 class VaultSecret
 {
+    /**
+     * Vault KV version 1 structure.
+     *
+     * @since 2.0.0
+     */
+    const TEMPLATE_TYPE_KV1 = 1;
+
+    /**
+     * Vault KV version 2 structure.
+     *
+     * @since 2.0.0
+     */
+    const TEMPLATE_TYPE_KV2 = 2;
+
     /**
      * Set VaultSecret params object.
      *
@@ -58,7 +71,7 @@ class VaultSecret
      *
      * @since 1.0.4
      */
-    static public function getSecret($key, $source = null, $default = null, $type = TemplateCreator::TEMPLATE_KV2)
+    static public function getSecret($key, $source = null, $default = null, $type = self::TEMPLATE_TYPE_KV2)
     {
         $secret = Secret::getInstance();
 

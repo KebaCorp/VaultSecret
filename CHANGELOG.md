@@ -1,5 +1,16 @@
-Array Excel Builder extension Change Log
-========================================
+VaultSecret extension Change Log
+================================
+
+2.0.0, February 09, 2020
+------------------------
+
+- Feat: Added the ability to load secrets directly from the Vault service.
+- Feat: Added KV1 template.
+- Feat: Added SecretHybridCache and SecretMemoryCache classes.
+- Feat: Added SecretConstants class.
+- Feat: Now the VaultSecret parameters are allocated in a separate class.
+- Docs: The README file has been updated.
+
 
 1.1.0, August 16, 2019
 ----------------------
