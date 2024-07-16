@@ -81,7 +81,7 @@ class SecretMemoryCache implements CacheInterface
      *
      * @since 2.0.0
      */
-    private function __wakeup()
+    public function __wakeup()
     {
     }
 
