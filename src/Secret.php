@@ -128,7 +128,7 @@ class Secret
      *
      * @since 1.0.4
      */
-    public function getSecret($key, $source = null, $default = null, $type = VaultSecret::TEMPLATE_TYPE_KV2)
+    public function getSecret(string $key, string $source, $default = null, $type = VaultSecret::TEMPLATE_TYPE_KV2)
     {
         $sourceKey = base64_encode($source);
 
