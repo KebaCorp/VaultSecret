@@ -79,7 +79,7 @@ class Secret
      *
      * @since 1.0.3
      */
-    private function __wakeup()
+    public function __wakeup()
     {
     }
 
