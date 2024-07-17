@@ -128,10 +128,8 @@ class Secret
      *
      * @since 1.0.4
      */
-    public function getSecret(string $key, string $source, $default = null, $type = VaultSecret::TEMPLATE_TYPE_KV2)
+    public function getSecret(string $key, ?string $source, $default = null, $type = VaultSecret::TEMPLATE_TYPE_KV2)
     {
-        $sourceKey = base64_encode($source);
-
         $secret = null;
         $cache = $this->_vaultSecretParams->getCache();
         $template = TemplateCreator::createTemplate($type);
@@ -140,6 +138,8 @@ class Secret
         if ($source === null) {
             $source = $this->_vaultSecretParams->getSource();
         }
+
+        $sourceKey = base64_encode($source);
 
         if ($cache->has($sourceKey)) {
             $template->setData($cache->get($sourceKey));
